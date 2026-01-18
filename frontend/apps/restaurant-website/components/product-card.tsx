@@ -5,6 +5,7 @@ import { Button } from "@pos-saas/ui";
 import { ShoppingCart, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import { useThemeColors } from "@/lib/hooks/use-theme";
+import { getImageConfig, optimizeImageUrl } from "@/lib/image-optimization";
 
 export interface Product {
   id: number;
@@ -81,10 +82,12 @@ function ProductCardComponent({
       >
         {(product.image || product.main_image_url) ? (
           <Image
-            src={product.image || product.main_image_url || ""}
+            src={optimizeImageUrl(product.image || product.main_image_url)}
             alt={product.name || product.name_en || "Product"}
             fill
             loading="lazy"
+            quality={80}
+            sizes={getImageConfig('productCard').sizes}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
