@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Loader, AlertCircle } from 'lucide-react';
 import { SectionRenderer, Header, Footer } from '@pos-saas/ui-themes';
 import { FeaturedProductsSection } from './featured-products-section';
+import { ErrorBoundary } from './error-boundary';
 
 interface ThemeColors {
   primary: string;
@@ -406,19 +407,26 @@ export function DynamicHomePage({ restaurantSlug, locale }: DynamicHomePageProps
         ) : (
           <>
             {visibleComponents.map(component => (
-              <SectionRenderer
+              <ErrorBoundary
                 key={component.id}
-                component={component as any}
-                isArabic={isRTL}
-              />
+                section={component.type}
+                locale={locale}
+              >
+                <SectionRenderer
+                  component={component as any}
+                  isArabic={isRTL}
+                />
+              </ErrorBoundary>
             ))}
 
             {/* Featured Products Section with Real Data and Add to Cart */}
-            <FeaturedProductsSection
-              restaurantSlug={restaurantSlug}
-              locale={locale}
-              limit={6}
-            />
+            <ErrorBoundary section="featured-products" locale={locale}>
+              <FeaturedProductsSection
+                restaurantSlug={restaurantSlug}
+                locale={locale}
+                limit={6}
+              />
+            </ErrorBoundary>
           </>
         )}
       </main>
