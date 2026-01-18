@@ -1,0 +1,139 @@
+/**
+ * Theme CSS Variables
+ * These are dynamically set by the ThemeProvider
+ * Format: HSL (Hue Saturation% Lightness%)
+ */
+
+:root {
+  /* Color Variables - HSL format for Tailwind compatibility */
+  --theme-primary: 30 100% 35%;
+  --theme-secondary: 220 100% 35%;
+  --theme-accent: 45 100% 50%;
+  --theme-background: 0 0% 100%;
+  --theme-text: 0 0% 13%;
+  --theme-border: 0 0% 90%;
+  --theme-shadow: 0 0% 0%;
+
+  /* Typography Variables */
+  --theme-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --theme-font-size: 16px;
+  --theme-line-height: 1.5;
+  --theme-border-radius: 8px;
+
+  /* Opacity variants for flexibility */
+  --theme-opacity-5: 0.05;
+  --theme-opacity-10: 0.1;
+  --theme-opacity-20: 0.2;
+  --theme-opacity-30: 0.3;
+  --theme-opacity-50: 0.5;
+  --theme-opacity-75: 0.75;
+}
+
+/**
+ * Dark mode adjustments
+ * Adjust colors when prefers-color-scheme: dark is active
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Lighten colors for dark mode */
+    --theme-primary: 30 100% 50%;
+    --theme-secondary: 220 100% 60%;
+    --theme-accent: 45 100% 60%;
+    --theme-background: 0 0% 9%;
+    --theme-text: 0 0% 95%;
+    --theme-border: 0 0% 30%;
+    --theme-shadow: 0 0% 0%;
+  }
+}
+
+/**
+ * Reduced motion support
+ * Disable animations for users who prefer reduced motion
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-duration: 0s;
+  }
+}
+
+/**
+ * High contrast mode support
+ */
+@media (prefers-contrast: more) {
+  :root {
+    --theme-border: 0 0% 50%;
+  }
+}
+
+/**
+ * Utility classes for theme colors
+ * Can be used in addition to CSS variables
+ */
+
+.bg-theme-primary {
+  background-color: hsl(var(--theme-primary));
+}
+
+.bg-theme-secondary {
+  background-color: hsl(var(--theme-secondary));
+}
+
+.bg-theme-accent {
+  background-color: hsl(var(--theme-accent));
+}
+
+.bg-theme-background {
+  background-color: hsl(var(--theme-background));
+}
+
+.text-theme-primary {
+  color: hsl(var(--theme-primary));
+}
+
+.text-theme-secondary {
+  color: hsl(var(--theme-secondary));
+}
+
+.text-theme-accent {
+  color: hsl(var(--theme-accent));
+}
+
+.text-theme-text {
+  color: hsl(var(--theme-text));
+}
+
+.border-theme-border {
+  border-color: hsl(var(--theme-border));
+}
+
+/**
+ * Theme color with opacity
+ * Usage: background-color: hsl(var(--theme-primary) / 0.5)
+ */
+
+.bg-theme-primary-50 {
+  background-color: hsl(var(--theme-primary) / 0.5);
+}
+
+.bg-theme-primary-75 {
+  background-color: hsl(var(--theme-primary) / 0.75);
+}
+
+.text-theme-text-light {
+  color: hsl(var(--theme-text) / 0.7);
+}
+
+.text-theme-text-lighter {
+  color: hsl(var(--theme-text) / 0.5);
+}
+
+/**
+ * REMOVED: Global transitions on all elements
+ * Reason: Caused expensive repaints on every color change, scrolling, and user interaction
+ * Solution: Apply transitions only where needed using CSS classes or Tailwind utilities
+ *
+ * Example of correct approach:
+ * .interactive-element {
+ *   transition: background-color 0.2s ease;
+ * }
+ */
