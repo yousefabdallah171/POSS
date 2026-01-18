@@ -1,0 +1,142 @@
+-- Migration: Migrate Existing Themes to Inheritance Model
+-- Date: January 4, 2026
+-- Purpose: Set up theme inheritance relationships and create default parent theme
+
+-- 1. Create default parent theme if it doesn't already exist
+INSERT INTO themes (
+    restaurant_id,
+    tenant_id,
+    name,
+    slug,
+    description,
+    version,
+    is_active,
+    is_published,
+    primary_color,
+    secondary_color,
+    accent_color,
+    background_color,
+    text_color,
+    border_color,
+    shadow_color,
+    font_family,
+    base_font_size,
+    border_radius,
+    line_height,
+    site_title,
+    logo_url,
+    favicon_url,
+    created_at,
+    updated_at
+) SELECT
+    DISTINCT restaurant_id,
+    tenant_id,
+    'Default' as name,
+    'default' as slug,
+    'Default parent theme for theme inheritance' as description,
+    1 as version,
+    1 as is_active,
+    1 as is_published,
+    '#FF6B35' as primary_color,
+    '#004E89' as secondary_color,
+    '#F77F00' as accent_color,
+    '#FFFFEB3B' as background_color,
+    '#1F2937' as text_color,
+    '#E5E7EB' as border_color,
+    '#000000' as shadow_color,
+    'Inter, system-ui, sans-serif' as font_family,
+    16 as base_font_size,
+    8 as border_radius,
+    1.6 as line_height,
+    'Default Restaurant' as site_title,
+    '' as logo_url,
+    '' as favicon_url,
+    NOW() as created_at,
+    NOW() as updated_at
+FROM themes
+WHERE NOT EXISTS (
+    SELECT 1 FROM themes t2
+    WHERE t2.restaurant_id = themes.restaurant_id
+    AND t2.slug = 'default'
+);
+
+-- 2. Create theme inheritance relationships for non-default themes
+-- Assign all non-default themes a default theme as parent
+INSERT INTO theme_inheritance (
+    theme_id,
+    parent_theme_id,
+    override_values,
+    inherited_level,
+    is_active,
+    created_at,
+    updated_at
+)
+SELECT
+    t.id as theme_id,
+    d.id as parent_theme_id,
+    '{}' as override_values,
+    0 as inherited_level,
+    1 as is_active,
+    NOW() as created_at,
+    NOW() as updated_at
+FROM themes t
+INNER JOIN themes d ON t.restaurant_id = d.restaurant_id AND d.slug = 'default'
+WHERE t.slug != 'default'
+AND NOT EXISTS (
+    SELECT 1 FROM theme_inheritance ti
+    WHERE ti.theme_id = t.id
+);
+
+-- 3. Initialize theme_inheritance_cache for all themes
+INSERT INTO theme_inheritance_cache (
+    theme_id,
+    resolved_properties,
+    inheritance_depth,
+    is_valid,
+    created_at,
+    updated_at
+)
+SELECT
+    t.id as theme_id,
+    JSON_OBJECT(
+        'primaryColor', t.primary_color,
+        'secondaryColor', t.secondary_color,
+        'accentColor', t.accent_color,
+        'backgroundColor', t.background_color,
+        'textColor', t.text_color,
+        'borderColor', t.border_color,
+        'shadowColor', t.shadow_color,
+        'fontFamily', t.font_family,
+        'baseFontSize', t.base_font_size,
+        'borderRadius', t.border_radius,
+        'lineHeight', t.line_height,
+        'siteTitle', t.site_title
+    ) as resolved_properties,
+    CASE
+        WHEN t.slug = 'default' THEN 0
+        ELSE 1
+    END as inheritance_depth,
+    1 as is_valid,
+    NOW() as created_at,
+    NOW() as updated_at
+FROM themes t
+WHERE NOT EXISTS (
+    SELECT 1 FROM theme_inheritance_cache tic
+    WHERE tic.theme_id = t.id
+);
+
+-- 4. Data validation: Check for orphaned themes
+-- This is a safety check to ensure no themes are without parents
+SELECT COUNT(*) as orphaned_themes_without_default
+FROM themes t
+WHERE t.slug != 'default'
+AND NOT EXISTS (
+    SELECT 1 FROM theme_inheritance ti
+    WHERE ti.theme_id = t.id
+);
+
+-- 5. Log migration completion
+-- Note: Actual logging would be done in application code
+-- This marks the migration as complete for tracking purposes
+ALTER TABLE themes ADD COLUMN IF NOT EXISTS migrated_to_inheritance DATETIME DEFAULT NULL;
+UPDATE themes SET migrated_to_inheritance = NOW() WHERE migrated_to_inheritance IS NULL;

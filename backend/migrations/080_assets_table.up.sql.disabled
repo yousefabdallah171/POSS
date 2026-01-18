@@ -1,0 +1,160 @@
+-- Migration 006: Add Asset Management System
+-- Enables centralized asset storage, deduplication, and CDN integration
+
+-- Create assets table
+CREATE TABLE IF NOT EXISTS assets (
+    id BIGSERIAL PRIMARY KEY,
+    restaurant_id BIGINT NOT NULL,
+
+    -- Asset ownership
+    component_id BIGINT,
+    theme_id BIGINT,
+
+    -- File information
+    original_filename VARCHAR(500) NOT NULL,
+    storage_key VARCHAR(1000) NOT NULL,
+    file_hash VARCHAR(64) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+
+    -- Size information
+    original_size BIGINT NOT NULL,
+    compressed_size BIGINT NOT NULL,
+
+    -- Image dimensions (nullable for non-image assets)
+    width INT,
+    height INT,
+
+    -- Deduplication
+    is_deduplicated BOOLEAN NOT NULL DEFAULT false,
+    duplicate_of BIGINT,
+
+    -- CDN information
+    cdn_url TEXT NOT NULL,
+
+    -- Asset metadata
+    is_public BOOLEAN NOT NULL DEFAULT true,
+    tags JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{"format": "unknown", "has_alpha": false, "compression_type": "auto", "checksum": ""}',
+
+    -- Versioning
+    versions JSONB DEFAULT '[]',
+
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign keys
+    CONSTRAINT fk_assets_restaurant
+        FOREIGN KEY (restaurant_id)
+        REFERENCES restaurants(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_assets_component
+        FOREIGN KEY (component_id)
+        REFERENCES components(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_assets_theme
+        FOREIGN KEY (theme_id)
+        REFERENCES themes(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_assets_duplicate
+        FOREIGN KEY (duplicate_of)
+        REFERENCES assets(id)
+        ON DELETE SET NULL,
+
+    -- Unique constraint on file hash per restaurant
+    CONSTRAINT uq_asset_file_hash
+        UNIQUE(restaurant_id, file_hash)
+);
+
+-- Create indexes for efficient querying
+CREATE INDEX idx_assets_restaurant_id ON assets(restaurant_id);
+CREATE INDEX idx_assets_component_id ON assets(component_id);
+CREATE INDEX idx_assets_theme_id ON assets(theme_id);
+CREATE INDEX idx_assets_file_hash ON assets(file_hash);
+CREATE INDEX idx_assets_storage_key ON assets(storage_key);
+CREATE INDEX idx_assets_mime_type ON assets(mime_type);
+CREATE INDEX idx_assets_is_deduplicated ON assets(is_deduplicated);
+CREATE INDEX idx_assets_duplicate_of ON assets(duplicate_of);
+CREATE INDEX idx_assets_created_at ON assets(created_at DESC);
+CREATE INDEX idx_assets_is_public ON assets(is_public);
+
+-- Create asset_usage table to track asset references
+CREATE TABLE IF NOT EXISTS asset_usage (
+    id BIGSERIAL PRIMARY KEY,
+    asset_id BIGINT NOT NULL,
+    used_in_type VARCHAR(50) NOT NULL,
+    used_in_id BIGINT NOT NULL,
+    usage_context VARCHAR(255),
+    last_used_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_asset_usage_asset
+        FOREIGN KEY (asset_id)
+        REFERENCES assets(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_asset_usage
+        UNIQUE(asset_id, used_in_type, used_in_id)
+);
+
+-- Create index for asset usage queries
+CREATE INDEX idx_asset_usage_asset_id ON asset_usage(asset_id);
+CREATE INDEX idx_asset_usage_used_in ON asset_usage(used_in_type, used_in_id);
+CREATE INDEX idx_asset_usage_last_used ON asset_usage(last_used_at DESC);
+
+-- Create asset_cdn_cache table to track CDN sync status
+CREATE TABLE IF NOT EXISTS asset_cdn_cache (
+    id BIGSERIAL PRIMARY KEY,
+    asset_id BIGINT NOT NULL UNIQUE,
+    cdn_provider VARCHAR(50) NOT NULL,
+    cdn_key VARCHAR(1000) NOT NULL,
+    cdn_etag VARCHAR(255),
+    is_synced BOOLEAN NOT NULL DEFAULT true,
+    last_synced_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_cdn_cache_asset
+        FOREIGN KEY (asset_id)
+        REFERENCES assets(id)
+        ON DELETE CASCADE
+);
+
+-- Create index for CDN cache queries
+CREATE INDEX idx_asset_cdn_cache_provider ON asset_cdn_cache(cdn_provider);
+CREATE INDEX idx_asset_cdn_cache_synced ON asset_cdn_cache(is_synced);
+
+-- Create trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_assets_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_update_assets_timestamp ON assets;
+CREATE TRIGGER trigger_update_assets_timestamp
+    BEFORE UPDATE ON assets
+    FOR EACH ROW
+    EXECUTE FUNCTION update_assets_timestamp();
+
+DROP TRIGGER IF EXISTS trigger_update_asset_cdn_cache_timestamp ON asset_cdn_cache;
+CREATE TRIGGER trigger_update_asset_cdn_cache_timestamp
+    BEFORE UPDATE ON asset_cdn_cache
+    FOR EACH ROW
+    EXECUTE FUNCTION update_assets_timestamp();
+
+-- Add comments
+COMMENT ON TABLE assets IS 'Stores asset metadata with deduplication and CDN tracking';
+COMMENT ON TABLE asset_usage IS 'Tracks where assets are used to prevent deletion of in-use assets';
+COMMENT ON TABLE asset_cdn_cache IS 'Tracks CDN synchronization status for assets';
+COMMENT ON COLUMN assets.file_hash IS 'SHA-256 hash of file for deduplication';
+COMMENT ON COLUMN assets.is_deduplicated IS 'Whether this asset is a duplicate of another';
+COMMENT ON COLUMN assets.duplicate_of IS 'ID of original asset if this is a duplicate';
+COMMENT ON COLUMN assets.metadata IS 'JSON metadata including format, dimensions, EXIF data';
+COMMENT ON COLUMN asset_usage.last_used_at IS 'Timestamp of last access to this asset';

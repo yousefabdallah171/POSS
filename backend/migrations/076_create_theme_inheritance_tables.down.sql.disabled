@@ -1,0 +1,11 @@
+-- Rollback: Theme Inheritance System Tables
+-- Date: January 3, 2026
+
+DROP TABLE IF EXISTS theme_inheritance_cache;
+DROP TABLE IF EXISTS theme_property_override;
+DROP TABLE IF EXISTS theme_inheritance;
+
+-- Remove parent_theme_id from themes table
+ALTER TABLE themes DROP FOREIGN KEY fk_parent_theme;
+ALTER TABLE themes DROP INDEX idx_parent_theme_id;
+ALTER TABLE themes DROP COLUMN parent_theme_id;

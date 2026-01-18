@@ -1,0 +1,186 @@
+-- Migration: Create Tenant Audit Logs Table
+-- Description: Audit trail for tenant-sensitive operations
+-- Tracks security events, permission changes, and sensitive data access
+
+CREATE TABLE IF NOT EXISTS tenant_audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+
+    -- Tenant and User Information
+    tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+
+    -- Action Information
+    action VARCHAR(100) NOT NULL,  -- Examples: 'USER_CREATED', 'PERMISSION_GRANTED', 'ROLE_ASSIGNED', 'UNAUTHORIZED_ACCESS_ATTEMPT'
+    resource_type VARCHAR(50),      -- Examples: 'user', 'role', 'permission', 'product', 'order'
+    resource_id BIGINT,             -- ID of affected resource
+
+    -- Before/After Values (for tracking changes)
+    old_value JSONB,                -- Previous value (for updates)
+    new_value JSONB,                -- New value (for creates/updates)
+
+    -- Request Information
+    ip_address INET,                -- Client IP address
+    user_agent TEXT,                -- Browser/client user agent
+    request_path VARCHAR(500),      -- API endpoint that triggered action
+    request_method VARCHAR(10),     -- GET, POST, PUT, DELETE, etc.
+
+    -- Status and Results
+    success BOOLEAN DEFAULT true,   -- Whether operation succeeded
+    error_message TEXT,             -- Error message if failed
+
+    -- Timestamps
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Constraint: tenant_id must be > 0
+    CONSTRAINT check_audit_tenant_id CHECK (tenant_id > 0)
+);
+
+-- ============================================================================
+-- Indexes for Fast Audit Log Queries
+-- ============================================================================
+
+-- Primary lookups
+CREATE INDEX IF NOT EXISTS idx_audit_tenant_id ON tenant_audit_logs(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_audit_user_id ON tenant_audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_created_at ON tenant_audit_logs(created_at DESC);
+
+-- Tenant + User lookups (most common)
+CREATE INDEX IF NOT EXISTS idx_audit_tenant_user ON tenant_audit_logs(tenant_id, user_id);
+
+-- Security-related lookups
+CREATE INDEX IF NOT EXISTS idx_audit_action ON tenant_audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_tenant_action ON tenant_audit_logs(tenant_id, action);
+
+-- Time-range searches
+CREATE INDEX IF NOT EXISTS idx_audit_tenant_created ON tenant_audit_logs(tenant_id, created_at DESC);
+
+-- Failed attempt detection
+CREATE INDEX IF NOT EXISTS idx_audit_failed ON tenant_audit_logs(tenant_id, success, created_at DESC)
+WHERE success = false;
+
+-- ============================================================================
+-- Views for Common Audit Queries
+-- ============================================================================
+
+-- View for security alerts (unauthorized access attempts, failed operations)
+CREATE OR REPLACE VIEW v_security_alerts AS
+SELECT
+    aal.id,
+    aal.tenant_id,
+    u.email as user_email,
+    aal.action,
+    aal.resource_type,
+    aal.ip_address,
+    aal.error_message,
+    aal.created_at
+FROM tenant_audit_logs aal
+LEFT JOIN users u ON aal.user_id = u.id
+WHERE aal.success = false
+   OR aal.action IN ('UNAUTHORIZED_ACCESS_ATTEMPT', 'CROSS_TENANT_ACCESS_ATTEMPT', 'PERMISSION_DENIED')
+ORDER BY aal.created_at DESC;
+
+-- View for user activity
+CREATE OR REPLACE VIEW v_user_activity AS
+SELECT
+    aal.id,
+    aal.tenant_id,
+    aal.user_id,
+    u.email as user_email,
+    aal.action,
+    aal.resource_type,
+    aal.resource_id,
+    aal.request_path,
+    aal.created_at
+FROM tenant_audit_logs aal
+LEFT JOIN users u ON aal.user_id = u.id
+ORDER BY aal.created_at DESC;
+
+-- View for role/permission changes
+CREATE OR REPLACE VIEW v_permission_changes AS
+SELECT
+    aal.id,
+    aal.tenant_id,
+    aal.user_id,
+    u.email as user_email,
+    aal.action,
+    aal.resource_type,
+    aal.old_value,
+    aal.new_value,
+    aal.created_at
+FROM tenant_audit_logs aal
+LEFT JOIN users u ON aal.user_id = u.id
+WHERE aal.action IN ('PERMISSION_GRANTED', 'PERMISSION_REVOKED', 'ROLE_ASSIGNED', 'ROLE_REMOVED', 'PERMISSION_UPDATED')
+ORDER BY aal.created_at DESC;
+
+-- ============================================================================
+-- Functions for Audit Logging
+-- ============================================================================
+
+-- Function to log tenant audit events (can be called from application)
+CREATE OR REPLACE FUNCTION log_tenant_audit(
+    p_tenant_id BIGINT,
+    p_user_id BIGINT,
+    p_action VARCHAR,
+    p_resource_type VARCHAR,
+    p_resource_id BIGINT,
+    p_old_value JSONB,
+    p_new_value JSONB,
+    p_ip_address INET,
+    p_user_agent TEXT,
+    p_request_path VARCHAR,
+    p_request_method VARCHAR,
+    p_success BOOLEAN,
+    p_error_message TEXT
+)
+RETURNS BIGINT AS $$
+DECLARE
+    v_log_id BIGINT;
+BEGIN
+    INSERT INTO tenant_audit_logs (
+        tenant_id, user_id, action, resource_type, resource_id,
+        old_value, new_value, ip_address, user_agent,
+        request_path, request_method, success, error_message
+    ) VALUES (
+        p_tenant_id, p_user_id, p_action, p_resource_type, p_resource_id,
+        p_old_value, p_new_value, p_ip_address, p_user_agent,
+        p_request_path, p_request_method, p_success, p_error_message
+    )
+    RETURNING id INTO v_log_id;
+
+    RETURN v_log_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- Common Audit Log Queries (Examples)
+-- ============================================================================
+
+-- Query: Find all security alerts in the last 7 days
+-- SELECT * FROM v_security_alerts WHERE created_at > CURRENT_TIMESTAMP - INTERVAL '7 days';
+
+-- Query: Find all role changes for a tenant
+-- SELECT * FROM v_permission_changes WHERE tenant_id = $1 ORDER BY created_at DESC;
+
+-- Query: Find failed login attempts
+-- SELECT * FROM tenant_audit_logs
+-- WHERE tenant_id = $1
+--   AND action = 'LOGIN_FAILED'
+--   AND created_at > CURRENT_TIMESTAMP - INTERVAL '1 day'
+-- ORDER BY created_at DESC;
+
+-- Query: Find unauthorized access attempts
+-- SELECT * FROM tenant_audit_logs
+-- WHERE tenant_id = $1
+--   AND action IN ('UNAUTHORIZED_ACCESS_ATTEMPT', 'CROSS_TENANT_ACCESS_ATTEMPT', 'PERMISSION_DENIED')
+--   AND created_at > CURRENT_TIMESTAMP - INTERVAL '1 day'
+-- ORDER BY created_at DESC;
+
+-- Query: Get audit summary for a user
+-- SELECT
+--     action,
+--     COUNT(*) as count,
+--     MAX(created_at) as last_occurrence
+-- FROM tenant_audit_logs
+-- WHERE tenant_id = $1 AND user_id = $2
+-- GROUP BY action
+-- ORDER BY last_occurrence DESC;

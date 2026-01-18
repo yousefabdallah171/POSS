@@ -1,0 +1,28 @@
+-- Rollback Migration 006: Remove Asset Management System
+
+-- Drop triggers first
+DROP TRIGGER IF EXISTS trigger_update_asset_cdn_cache_timestamp ON asset_cdn_cache;
+DROP TRIGGER IF EXISTS trigger_update_assets_timestamp ON assets;
+DROP FUNCTION IF EXISTS update_assets_timestamp();
+
+-- Drop tables in reverse order of dependencies
+DROP TABLE IF EXISTS asset_cdn_cache;
+DROP TABLE IF EXISTS asset_usage;
+DROP TABLE IF EXISTS assets;
+
+-- Drop related indexes (should be auto-dropped with tables, but just in case)
+DROP INDEX IF EXISTS idx_assets_restaurant_id;
+DROP INDEX IF EXISTS idx_assets_component_id;
+DROP INDEX IF EXISTS idx_assets_theme_id;
+DROP INDEX IF EXISTS idx_assets_file_hash;
+DROP INDEX IF EXISTS idx_assets_storage_key;
+DROP INDEX IF EXISTS idx_assets_mime_type;
+DROP INDEX IF EXISTS idx_assets_is_deduplicated;
+DROP INDEX IF EXISTS idx_assets_duplicate_of;
+DROP INDEX IF EXISTS idx_assets_created_at;
+DROP INDEX IF EXISTS idx_assets_is_public;
+DROP INDEX IF EXISTS idx_asset_usage_asset_id;
+DROP INDEX IF EXISTS idx_asset_usage_used_in;
+DROP INDEX IF EXISTS idx_asset_usage_last_used;
+DROP INDEX IF EXISTS idx_asset_cdn_cache_provider;
+DROP INDEX IF EXISTS idx_asset_cdn_cache_synced;

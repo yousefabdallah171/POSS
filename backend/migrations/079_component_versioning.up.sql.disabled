@@ -1,0 +1,168 @@
+-- Migration 005: Add Component Versioning System
+-- Enables semantic versioning for components with compatibility tracking
+
+-- Create component_versions table
+CREATE TABLE IF NOT EXISTS component_versions (
+    id BIGSERIAL PRIMARY KEY,
+    component_id BIGINT NOT NULL,
+
+    -- Semantic version components
+    version VARCHAR(50) NOT NULL,
+    major INT NOT NULL,
+    minor INT NOT NULL,
+    patch INT NOT NULL DEFAULT 0,
+    prerelease VARCHAR(255),
+    metadata VARCHAR(255),
+
+    -- Version metadata
+    description TEXT,
+    release_notes TEXT,
+    changelog TEXT,
+
+    -- Version status
+    is_latest BOOLEAN NOT NULL DEFAULT false,
+    is_deprecated BOOLEAN NOT NULL DEFAULT false,
+    deprecation_message TEXT,
+
+    -- Breaking changes tracking
+    breaking_changes JSONB DEFAULT '{"has_breaking_changes": false, "changes": [], "migration_required": false, "migration_steps": []}',
+
+    -- Migration guides (JSON array of migration steps)
+    migration_guides JSONB DEFAULT '[]',
+
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign key
+    CONSTRAINT fk_component_versions_component
+        FOREIGN KEY (component_id)
+        REFERENCES components(id)
+        ON DELETE CASCADE,
+
+    -- Unique constraint: one version per component
+    CONSTRAINT uq_component_version
+        UNIQUE(component_id, version)
+);
+
+-- Create indexes for efficient querying
+CREATE INDEX idx_component_versions_component_id ON component_versions(component_id);
+CREATE INDEX idx_component_versions_is_latest ON component_versions(component_id, is_latest);
+CREATE INDEX idx_component_versions_is_deprecated ON component_versions(is_deprecated);
+CREATE INDEX idx_component_versions_version_semver ON component_versions(component_id, major, minor, patch);
+CREATE INDEX idx_component_versions_created_at ON component_versions(created_at DESC);
+
+-- Create component_compatibility table to track version compatibility
+CREATE TABLE IF NOT EXISTS component_compatibility (
+    id BIGSERIAL PRIMARY KEY,
+
+    -- Source version (the version we're checking compatibility FROM)
+    source_version_id BIGINT NOT NULL,
+
+    -- Target version (the version we're checking compatibility TO)
+    target_version_id BIGINT NOT NULL,
+
+    -- Compatibility info
+    is_compatible BOOLEAN NOT NULL DEFAULT true,
+    compatibility_notes TEXT,
+    auto_migrable BOOLEAN NOT NULL DEFAULT false,
+    migration_script TEXT,
+    estimated_migration_minutes INT,
+
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign keys
+    CONSTRAINT fk_compat_source_version
+        FOREIGN KEY (source_version_id)
+        REFERENCES component_versions(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_compat_target_version
+        FOREIGN KEY (target_version_id)
+        REFERENCES component_versions(id)
+        ON DELETE CASCADE,
+
+    -- Unique constraint: one compatibility record per version pair
+    CONSTRAINT uq_version_compatibility
+        UNIQUE(source_version_id, target_version_id)
+);
+
+-- Create indexes for compatibility queries
+CREATE INDEX idx_component_compatibility_source ON component_compatibility(source_version_id);
+CREATE INDEX idx_component_compatibility_target ON component_compatibility(target_version_id);
+CREATE INDEX idx_component_compatibility_compatible ON component_compatibility(is_compatible);
+CREATE INDEX idx_component_compatibility_auto_migrable ON component_compatibility(auto_migrable);
+
+-- Add version column to components table (if not already present)
+-- This tracks which version is currently deployed/active
+ALTER TABLE components ADD COLUMN IF NOT EXISTS current_version VARCHAR(50);
+ALTER TABLE components ADD COLUMN IF NOT EXISTS supported_version_range VARCHAR(255) DEFAULT '*';
+
+-- Create index for version queries
+CREATE INDEX IF NOT EXISTS idx_components_current_version ON components(current_version);
+
+-- Create trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_component_versions_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_update_component_versions_timestamp ON component_versions;
+CREATE TRIGGER trigger_update_component_versions_timestamp
+    BEFORE UPDATE ON component_versions
+    FOR EACH ROW
+    EXECUTE FUNCTION update_component_versions_timestamp();
+
+-- Create similar trigger for compatibility table
+DROP TRIGGER IF EXISTS trigger_update_component_compatibility_timestamp ON component_compatibility;
+CREATE TRIGGER trigger_update_component_compatibility_timestamp
+    BEFORE UPDATE ON component_compatibility
+    FOR EACH ROW
+    EXECUTE FUNCTION update_component_versions_timestamp();
+
+-- Insert initial versions for existing components (Version 1.0.0 for all)
+INSERT INTO component_versions (
+    component_id,
+    version,
+    major,
+    minor,
+    patch,
+    description,
+    is_latest,
+    created_at,
+    updated_at
+)
+SELECT
+    id,
+    '1.0.0',
+    1,
+    0,
+    0,
+    COALESCE(description, 'Initial version'),
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM components
+WHERE NOT EXISTS (
+    SELECT 1 FROM component_versions cv WHERE cv.component_id = components.id
+)
+ON CONFLICT (component_id, version) DO NOTHING;
+
+-- Update components.current_version to point to v1.0.0
+UPDATE components
+SET current_version = '1.0.0'
+WHERE current_version IS NULL;
+
+-- Add comments to tables
+COMMENT ON TABLE component_versions IS 'Stores semantic versions of components with compatibility tracking';
+COMMENT ON TABLE component_compatibility IS 'Tracks compatibility between component versions and migration paths';
+COMMENT ON COLUMN component_versions.version IS 'Semantic version string (e.g., 1.2.3, 1.2.3-alpha, 1.2.3+build.1)';
+COMMENT ON COLUMN component_versions.breaking_changes IS 'JSON object describing breaking changes in this version';
+COMMENT ON COLUMN component_versions.migration_guides IS 'JSON array of migration guides to upgrade from other versions';
+COMMENT ON COLUMN component_compatibility.is_compatible IS 'Whether source version can safely upgrade to target version';
+COMMENT ON COLUMN component_compatibility.auto_migrable IS 'Whether migration can be automated';

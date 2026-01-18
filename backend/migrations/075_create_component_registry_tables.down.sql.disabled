@@ -1,0 +1,6 @@
+-- Rollback: Component Registry System Tables
+-- Date: January 3, 2026
+
+DROP TABLE IF EXISTS component_version;
+DROP TABLE IF EXISTS component_theme_mapping;
+DROP TABLE IF EXISTS component_registry;

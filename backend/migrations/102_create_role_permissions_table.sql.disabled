@@ -1,0 +1,65 @@
+-- Migration: Create role_permissions table
+-- Description: Maps roles to module permissions
+-- Defines what permission level each role has for each module
+
+CREATE TABLE IF NOT EXISTS role_permissions (
+  id BIGSERIAL PRIMARY KEY,
+  tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  module_id BIGINT NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
+  permission_level VARCHAR(50) NOT NULL DEFAULT 'READ',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  -- Constraints: one permission per role+module combination per tenant
+  UNIQUE(tenant_id, role_id, module_id),
+  CHECK(permission_level IN ('READ', 'WRITE', 'DELETE', 'ADMIN', 'NONE'))
+);
+
+-- Indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_role_perm_tenant ON role_permissions(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_role_perm_role ON role_permissions(role_id);
+CREATE INDEX IF NOT EXISTS idx_role_perm_module ON role_permissions(module_id);
+CREATE INDEX IF NOT EXISTS idx_role_perm_level ON role_permissions(permission_level);
+CREATE INDEX IF NOT EXISTS idx_role_perm_tenant_role ON role_permissions(tenant_id, role_id);
+
+-- Insert default permissions: ADMIN role gets full access to all modules
+INSERT INTO role_permissions (tenant_id, role_id, module_id, permission_level)
+SELECT r.tenant_id, r.id, m.id, 'ADMIN'
+FROM roles r, modules m
+WHERE r.name = 'ADMIN' AND r.is_system = TRUE AND m.is_active = TRUE
+ON CONFLICT DO NOTHING;
+
+-- Insert default permissions: MANAGER role gets WRITE to Products, Categories, HR; READ to others
+INSERT INTO role_permissions (tenant_id, role_id, module_id, permission_level)
+SELECT r.tenant_id, r.id, m.id,
+  CASE
+    WHEN m.name IN ('PRODUCTS', 'CATEGORIES', 'HR') THEN 'WRITE'
+    WHEN m.name IN ('NOTIFICATIONS', 'SETTINGS', 'REPORTS') THEN 'READ'
+    ELSE 'NONE'
+  END
+FROM roles r, modules m
+WHERE r.name = 'MANAGER' AND r.is_system = TRUE AND m.is_active = TRUE
+ON CONFLICT DO NOTHING;
+
+-- Insert default permissions: STAFF role gets READ to most modules
+INSERT INTO role_permissions (tenant_id, role_id, module_id, permission_level)
+SELECT r.tenant_id, r.id, m.id,
+  CASE
+    WHEN m.name IN ('PRODUCTS', 'CATEGORIES', 'HR', 'NOTIFICATIONS', 'REPORTS', 'SETTINGS') THEN 'READ'
+    ELSE 'NONE'
+  END
+FROM roles r, modules m
+WHERE r.name = 'STAFF' AND r.is_system = TRUE AND m.is_active = TRUE
+ON CONFLICT DO NOTHING;
+
+-- Insert default permissions: VIEWER role gets READ-only to main modules
+INSERT INTO role_permissions (tenant_id, role_id, module_id, permission_level)
+SELECT r.tenant_id, r.id, m.id,
+  CASE
+    WHEN m.name IN ('PRODUCTS', 'CATEGORIES', 'HR', 'NOTIFICATIONS', 'REPORTS') THEN 'READ'
+    ELSE 'NONE'
+  END
+FROM roles r, modules m
+WHERE r.name = 'VIEWER' AND r.is_system = TRUE AND m.is_active = TRUE
+ON CONFLICT DO NOTHING;

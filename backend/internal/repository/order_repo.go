@@ -1,0 +1,790 @@
+package repository
+
+import (
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"pos-saas/internal/domain"
+	"strings"
+	"time"
+)
+
+// OrderRepository handles order data operations
+type OrderRepository struct {
+	db *sql.DB
+}
+
+// NewOrderRepository creates new order repository
+func NewOrderRepository(db *sql.DB) *OrderRepository {
+	return &OrderRepository{db: db}
+}
+
+// CreateOrder inserts a new order into database
+func (r *OrderRepository) CreateOrder(order *domain.Order) (*domain.Order, error) {
+	query := `
+		INSERT INTO orders (
+			tenant_id, restaurant_id, order_number, customer_name, customer_email,
+			customer_phone, delivery_address, delivery_city, delivery_area,
+			delivery_zip_code, delivery_latitude, delivery_longitude,
+			delivery_instructions, subtotal, tax_amount, discount_amount,
+			delivery_fee, total_amount, payment_method, payment_status,
+			status, estimated_delivery_time, notes, order_source
+		) VALUES (
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+			$16, $17, $18, $19, $20, $21, $22, $23, $24
+		)
+		RETURNING id, created_at, updated_at
+	`
+
+	// Handle nullable fields
+	var customerEmail, deliveryAddress, deliveryCity, deliveryArea, deliveryZipCode, deliveryInstructions sql.NullString
+	var deliveryLatitude, deliveryLongitude sql.NullFloat64
+	var paymentMethod sql.NullString
+	var estimatedDeliveryTime sql.NullTime
+
+	if order.CustomerEmail != "" {
+		customerEmail = sql.NullString{String: order.CustomerEmail, Valid: true}
+	}
+	if order.DeliveryAddress != "" {
+		deliveryAddress = sql.NullString{String: order.DeliveryAddress, Valid: true}
+	}
+	if order.DeliveryCity != "" {
+		deliveryCity = sql.NullString{String: order.DeliveryCity, Valid: true}
+	}
+	if order.DeliveryArea != "" {
+		deliveryArea = sql.NullString{String: order.DeliveryArea, Valid: true}
+	}
+	if order.DeliveryZipCode != "" {
+		deliveryZipCode = sql.NullString{String: order.DeliveryZipCode, Valid: true}
+	}
+	if order.DeliveryInstructions != "" {
+		deliveryInstructions = sql.NullString{String: order.DeliveryInstructions, Valid: true}
+	}
+	if order.DeliveryLatitude != 0 {
+		deliveryLatitude = sql.NullFloat64{Float64: order.DeliveryLatitude, Valid: true}
+	}
+	if order.DeliveryLongitude != 0 {
+		deliveryLongitude = sql.NullFloat64{Float64: order.DeliveryLongitude, Valid: true}
+	}
+	if order.PaymentMethod != "" {
+		paymentMethod = sql.NullString{String: order.PaymentMethod, Valid: true}
+	}
+	if order.EstimatedDeliveryTime != nil {
+		estimatedDeliveryTime = sql.NullTime{Time: *order.EstimatedDeliveryTime, Valid: true}
+	}
+
+	err := r.db.QueryRow(query,
+		order.TenantID,
+		order.RestaurantID,
+		order.OrderNumber,
+		order.CustomerName,
+		customerEmail,
+		order.CustomerPhone,
+		deliveryAddress,
+		deliveryCity,
+		deliveryArea,
+		deliveryZipCode,
+		deliveryLatitude,
+		deliveryLongitude,
+		deliveryInstructions,
+		order.Subtotal,
+		order.TaxAmount,
+		order.DiscountAmount,
+		order.DeliveryFee,
+		order.TotalAmount,
+		paymentMethod,
+		order.PaymentStatus,
+		order.Status,
+		estimatedDeliveryTime,
+		order.Notes,
+		order.OrderSource,
+	).Scan(&order.ID, &order.CreatedAt, &order.UpdatedAt)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key") {
+			return nil, errors.New("order with this order number already exists")
+		}
+		return nil, fmt.Errorf("failed to create order: %w", err)
+	}
+
+	return order, nil
+}
+
+// GetOrderByID retrieves an order by ID with all items
+func (r *OrderRepository) GetOrderByID(tenantID, restaurantID, orderID int64) (*domain.Order, error) {
+	query := `
+		SELECT
+			id, tenant_id, restaurant_id, order_number, customer_name, customer_email,
+			customer_phone, delivery_address, delivery_city, delivery_area,
+			delivery_zip_code, delivery_latitude, delivery_longitude,
+			delivery_instructions, subtotal, tax_amount, discount_amount,
+			delivery_fee, total_amount, payment_method, payment_status,
+			status, estimated_delivery_time, actual_delivery_time, notes, order_source,
+			created_at, updated_at
+		FROM orders
+		WHERE id = $1 AND tenant_id = $2 AND restaurant_id = $3
+	`
+
+	order := &domain.Order{}
+	var customerEmail, deliveryAddress, deliveryCity, deliveryArea, deliveryZipCode, deliveryInstructions sql.NullString
+	var deliveryLatitude, deliveryLongitude sql.NullFloat64
+	var paymentMethod, notes sql.NullString
+	var estimatedDeliveryTime, actualDeliveryTime sql.NullTime
+
+	err := r.db.QueryRow(query, orderID, tenantID, restaurantID).Scan(
+		&order.ID, &order.TenantID, &order.RestaurantID, &order.OrderNumber,
+		&order.CustomerName, &customerEmail,
+		&order.CustomerPhone, &deliveryAddress, &deliveryCity, &deliveryArea,
+		&deliveryZipCode, &deliveryLatitude, &deliveryLongitude,
+		&deliveryInstructions, &order.Subtotal, &order.TaxAmount, &order.DiscountAmount,
+		&order.DeliveryFee, &order.TotalAmount, &paymentMethod, &order.PaymentStatus,
+		&order.Status, &estimatedDeliveryTime, &actualDeliveryTime, &notes, &order.OrderSource,
+		&order.CreatedAt, &order.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("order not found")
+		}
+		return nil, fmt.Errorf("failed to get order: %w", err)
+	}
+
+	// Handle nullable fields
+	if customerEmail.Valid {
+		order.CustomerEmail = customerEmail.String
+	}
+	if deliveryAddress.Valid {
+		order.DeliveryAddress = deliveryAddress.String
+	}
+	if deliveryCity.Valid {
+		order.DeliveryCity = deliveryCity.String
+	}
+	if deliveryArea.Valid {
+		order.DeliveryArea = deliveryArea.String
+	}
+	if deliveryZipCode.Valid {
+		order.DeliveryZipCode = deliveryZipCode.String
+	}
+	if deliveryInstructions.Valid {
+		order.DeliveryInstructions = deliveryInstructions.String
+	}
+	if deliveryLatitude.Valid {
+		order.DeliveryLatitude = deliveryLatitude.Float64
+	}
+	if deliveryLongitude.Valid {
+		order.DeliveryLongitude = deliveryLongitude.Float64
+	}
+	if paymentMethod.Valid {
+		order.PaymentMethod = paymentMethod.String
+	}
+	if estimatedDeliveryTime.Valid {
+		order.EstimatedDeliveryTime = &estimatedDeliveryTime.Time
+	}
+	if actualDeliveryTime.Valid {
+		order.ActualDeliveryTime = &actualDeliveryTime.Time
+	}
+	if notes.Valid {
+		order.Notes = notes.String
+	}
+
+	// Get order items
+	items, err := r.GetOrderItems(tenantID, orderID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order items: %w", err)
+	}
+	order.Items = items
+
+	return order, nil
+}
+
+// GetOrderByNumber retrieves an order by order number
+func (r *OrderRepository) GetOrderByNumber(tenantID, restaurantID int64, orderNumber string) (*domain.Order, error) {
+	query := `
+		SELECT id FROM orders
+		WHERE order_number = $1 AND tenant_id = $2 AND restaurant_id = $3
+	`
+
+	var orderID int64
+	err := r.db.QueryRow(query, orderNumber, tenantID, restaurantID).Scan(&orderID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("order not found")
+		}
+		return nil, fmt.Errorf("failed to get order by number: %w", err)
+	}
+
+	return r.GetOrderByID(tenantID, restaurantID, orderID)
+}
+
+// ListOrders retrieves paginated orders for a restaurant
+func (r *OrderRepository) ListOrders(tenantID, restaurantID int64, filters *domain.OrderListFilters) (*domain.OrderListResponse, error) {
+	query := `
+		SELECT
+			id, tenant_id, restaurant_id, order_number, customer_name, customer_email,
+			customer_phone, subtotal, tax_amount, discount_amount, delivery_fee,
+			total_amount, payment_status, status, order_source, created_at, updated_at
+		FROM orders
+		WHERE tenant_id = $1 AND restaurant_id = $2
+	`
+
+	args := []interface{}{tenantID, restaurantID}
+	argCount := 2
+
+	// Apply filters
+	if filters != nil {
+		if filters.Status != "" && domain.ValidStatus(filters.Status) {
+			argCount++
+			query += fmt.Sprintf(" AND status = $%d", argCount)
+			args = append(args, filters.Status)
+		}
+
+		if filters.PaymentStatus != "" && domain.ValidPaymentStatus(filters.PaymentStatus) {
+			argCount++
+			query += fmt.Sprintf(" AND payment_status = $%d", argCount)
+			args = append(args, filters.PaymentStatus)
+		}
+
+		if filters.CustomerName != "" {
+			argCount++
+			query += fmt.Sprintf(" AND customer_name ILIKE $%d", argCount)
+			args = append(args, "%"+filters.CustomerName+"%")
+		}
+
+		if filters.CustomerEmail != "" {
+			argCount++
+			query += fmt.Sprintf(" AND customer_email ILIKE $%d", argCount)
+			args = append(args, "%"+filters.CustomerEmail+"%")
+		}
+
+		if !filters.StartDate.IsZero() {
+			argCount++
+			query += fmt.Sprintf(" AND created_at >= $%d", argCount)
+			args = append(args, filters.StartDate)
+		}
+
+		if !filters.EndDate.IsZero() {
+			argCount++
+			query += fmt.Sprintf(" AND created_at <= $%d", argCount)
+			args = append(args, filters.EndDate)
+		}
+
+		if filters.MinAmount > 0 {
+			argCount++
+			query += fmt.Sprintf(" AND total_amount >= $%d", argCount)
+			args = append(args, filters.MinAmount)
+		}
+
+		if filters.MaxAmount > 0 {
+			argCount++
+			query += fmt.Sprintf(" AND total_amount <= $%d", argCount)
+			args = append(args, filters.MaxAmount)
+		}
+	}
+
+	// Count total matching orders
+	countQuery := strings.Replace(query, "SELECT id, tenant_id, restaurant_id, order_number, customer_name, customer_email, customer_phone, subtotal, tax_amount, discount_amount, delivery_fee, total_amount, payment_status, status, order_source, created_at, updated_at", "SELECT COUNT(*)", 1)
+	var total int64
+	err := r.db.QueryRow(countQuery, args...).Scan(&total)
+	if err != nil {
+		return nil, fmt.Errorf("failed to count orders: %w", err)
+	}
+
+	// Add ordering and pagination
+	query += " ORDER BY created_at DESC"
+
+	if filters != nil && filters.Limit > 0 {
+		offset := (filters.Page - 1) * filters.Limit
+		argCount += 2
+		query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argCount-1, argCount)
+		args = append(args, filters.Limit, offset)
+	}
+
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list orders: %w", err)
+	}
+	defer rows.Close()
+
+	orders := make([]domain.Order, 0)
+	for rows.Next() {
+		order := domain.Order{}
+		var customerEmail sql.NullString
+
+		err := rows.Scan(
+			&order.ID, &order.TenantID, &order.RestaurantID, &order.OrderNumber,
+			&order.CustomerName, &customerEmail,
+			&order.CustomerPhone, &order.Subtotal, &order.TaxAmount, &order.DiscountAmount,
+			&order.DeliveryFee, &order.TotalAmount, &order.PaymentStatus, &order.Status,
+			&order.OrderSource, &order.CreatedAt, &order.UpdatedAt,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan order: %w", err)
+		}
+
+		if customerEmail.Valid {
+			order.CustomerEmail = customerEmail.String
+		}
+
+		orders = append(orders, order)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating orders: %w", err)
+	}
+
+	page := int64(1)
+	limit := int64(10)
+	if filters != nil {
+		if filters.Page > 0 {
+			page = filters.Page
+		}
+		if filters.Limit > 0 {
+			limit = filters.Limit
+		}
+	}
+
+	pages := (total + limit - 1) / limit
+
+	return &domain.OrderListResponse{
+		Orders: orders,
+		Total:  total,
+		Page:   page,
+		Limit:  limit,
+		Pages:  pages,
+	}, nil
+}
+
+// UpdateOrderStatus updates the status of an order
+func (r *OrderRepository) UpdateOrderStatus(tenantID, restaurantID, orderID int64, newStatus string, changedBy *int64, reason string) error {
+	if !domain.ValidStatus(newStatus) {
+		return errors.New("invalid order status")
+	}
+
+	// Get current status for validation
+	var currentStatus string
+	err := r.db.QueryRow(
+		"SELECT status FROM orders WHERE id = $1 AND tenant_id = $2 AND restaurant_id = $3",
+		orderID, tenantID, restaurantID,
+	).Scan(&currentStatus)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("order not found")
+		}
+		return fmt.Errorf("failed to get order status: %w", err)
+	}
+
+	// Validate status transition
+	if !domain.CanTransitionStatus(currentStatus, newStatus) {
+		return fmt.Errorf("invalid status transition from %s to %s", currentStatus, newStatus)
+	}
+
+	// Update order status
+	query := `
+		UPDATE orders
+		SET status = $1, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $2 AND tenant_id = $3 AND restaurant_id = $4
+	`
+
+	result, err := r.db.Exec(query, newStatus, orderID, tenantID, restaurantID)
+	if err != nil {
+		return fmt.Errorf("failed to update order status: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("order not found")
+	}
+
+	// Record status change in history
+	historyQuery := `
+		INSERT INTO order_status_history (order_id, old_status, new_status, changed_by, change_reason)
+		VALUES ($1, $2, $3, $4, $5)
+	`
+
+	var changedByValue interface{} = nil
+	if changedBy != nil {
+		changedByValue = *changedBy
+	}
+
+	var reasonValue interface{} = nil
+	if reason != "" {
+		reasonValue = reason
+	}
+
+	_, err = r.db.Exec(historyQuery, orderID, currentStatus, newStatus, changedByValue, reasonValue)
+	if err != nil {
+		return fmt.Errorf("failed to record status change: %w", err)
+	}
+
+	return nil
+}
+
+// UpdatePaymentStatus updates the payment status of an order
+func (r *OrderRepository) UpdatePaymentStatus(tenantID, restaurantID, orderID int64, paymentStatus string) error {
+	if !domain.ValidPaymentStatus(paymentStatus) {
+		return errors.New("invalid payment status")
+	}
+
+	query := `
+		UPDATE orders
+		SET payment_status = $1, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $2 AND tenant_id = $3 AND restaurant_id = $4
+	`
+
+	result, err := r.db.Exec(query, paymentStatus, orderID, tenantID, restaurantID)
+	if err != nil {
+		return fmt.Errorf("failed to update payment status: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("order not found")
+	}
+
+	return nil
+}
+
+// CancelOrder cancels an order
+func (r *OrderRepository) CancelOrder(tenantID, restaurantID, orderID int64, reason string) error {
+	// Check if order can be cancelled
+	var currentStatus string
+	err := r.db.QueryRow(
+		"SELECT status FROM orders WHERE id = $1 AND tenant_id = $2 AND restaurant_id = $3",
+		orderID, tenantID, restaurantID,
+	).Scan(&currentStatus)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("order not found")
+		}
+		return fmt.Errorf("failed to get order status: %w", err)
+	}
+
+	// Orders that have been delivered or already cancelled cannot be cancelled
+	if currentStatus == "delivered" || currentStatus == "cancelled" {
+		return fmt.Errorf("cannot cancel order with status: %s", currentStatus)
+	}
+
+	query := `
+		UPDATE orders
+		SET status = 'cancelled', updated_at = CURRENT_TIMESTAMP
+		WHERE id = $1 AND tenant_id = $2 AND restaurant_id = $3
+	`
+
+	result, err := r.db.Exec(query, orderID, tenantID, restaurantID)
+	if err != nil {
+		return fmt.Errorf("failed to cancel order: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("order not found")
+	}
+
+	// Record cancellation in history
+	historyQuery := `
+		INSERT INTO order_status_history (order_id, old_status, new_status, change_reason)
+		VALUES ($1, $2, 'cancelled', $3)
+	`
+
+	var reasonValue interface{} = nil
+	if reason != "" {
+		reasonValue = reason
+	}
+
+	_, err = r.db.Exec(historyQuery, orderID, currentStatus, reasonValue)
+	if err != nil {
+		return fmt.Errorf("failed to record cancellation: %w", err)
+	}
+
+	return nil
+}
+
+// CreateOrderItem inserts an order item
+func (r *OrderRepository) CreateOrderItem(item *domain.OrderItem) (*domain.OrderItem, error) {
+	query := `
+		INSERT INTO order_items (
+			order_id, product_id, variant_id, product_name, variant_name,
+			quantity, unit_price, discount_amount, total_price,
+			special_instructions, addons
+		) VALUES (
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+		)
+		RETURNING id, created_at, updated_at
+	`
+
+	// Marshal addons to JSON
+	var addonsJSON interface{} = nil
+	if len(item.AddOns) > 0 {
+		bytes, err := json.Marshal(item.AddOns)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal addons: %w", err)
+		}
+		addonsJSON = string(bytes)
+	}
+
+	// Handle nullable fields
+	var variantID sql.NullInt64
+	if item.VariantID != nil {
+		variantID = sql.NullInt64{Int64: *item.VariantID, Valid: true}
+	}
+
+	var variantNameStr sql.NullString
+	if item.VariantName != "" {
+		variantNameStr = sql.NullString{String: item.VariantName, Valid: true}
+	}
+
+	var specialInstructions sql.NullString
+	if item.SpecialInstructions != "" {
+		specialInstructions = sql.NullString{String: item.SpecialInstructions, Valid: true}
+	}
+
+	err := r.db.QueryRow(query,
+		item.OrderID,
+		item.ProductID,
+		variantID,
+		item.ProductName,
+		variantNameStr,
+		item.Quantity,
+		item.UnitPrice,
+		item.DiscountAmount,
+		item.TotalPrice,
+		specialInstructions,
+		addonsJSON,
+	).Scan(&item.ID, &item.CreatedAt, &item.UpdatedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create order item: %w", err)
+	}
+
+	return item, nil
+}
+
+// GetOrderItems retrieves all items for an order
+func (r *OrderRepository) GetOrderItems(tenantID, orderID int64) ([]domain.OrderItem, error) {
+	query := `
+		SELECT
+			id, order_id, product_id, variant_id, product_name, variant_name,
+			quantity, unit_price, discount_amount, total_price,
+			special_instructions, addons, created_at, updated_at
+		FROM order_items
+		WHERE order_id = $1
+		ORDER BY created_at ASC
+	`
+
+	rows, err := r.db.Query(query, orderID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order items: %w", err)
+	}
+	defer rows.Close()
+
+	items := make([]domain.OrderItem, 0)
+	for rows.Next() {
+		item := domain.OrderItem{}
+		var variantID sql.NullInt64
+		var variantName, specialInstructions sql.NullString
+		var addonsJSON []byte
+
+		err := rows.Scan(
+			&item.ID, &item.OrderID, &item.ProductID, &variantID,
+			&item.ProductName, &variantName,
+			&item.Quantity, &item.UnitPrice, &item.DiscountAmount, &item.TotalPrice,
+			&specialInstructions, &addonsJSON, &item.CreatedAt, &item.UpdatedAt,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan order item: %w", err)
+		}
+
+		if variantID.Valid {
+			item.VariantID = &variantID.Int64
+		}
+
+		if variantName.Valid {
+			item.VariantName = variantName.String
+		}
+
+		if specialInstructions.Valid {
+			item.SpecialInstructions = specialInstructions.String
+		}
+
+		// Store addons as raw JSON
+		if len(addonsJSON) > 0 {
+			item.AddOns = json.RawMessage(addonsJSON)
+		}
+
+		items = append(items, item)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating order items: %w", err)
+	}
+
+	return items, nil
+}
+
+// GetOrderStatusHistory retrieves the status change history for an order
+func (r *OrderRepository) GetOrderStatusHistory(tenantID, orderID int64) ([]domain.OrderStatusHistory, error) {
+	query := `
+		SELECT
+			id, order_id, old_status, new_status, changed_by,
+			change_reason, created_at
+		FROM order_status_history
+		WHERE order_id = $1
+		ORDER BY created_at DESC
+	`
+
+	rows, err := r.db.Query(query, orderID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order status history: %w", err)
+	}
+	defer rows.Close()
+
+	history := make([]domain.OrderStatusHistory, 0)
+	for rows.Next() {
+		h := domain.OrderStatusHistory{}
+		var oldStatus, changeReason sql.NullString
+		var changedBy sql.NullInt64
+
+		err := rows.Scan(
+			&h.ID, &h.OrderID, &oldStatus, &h.NewStatus, &changedBy,
+			&changeReason, &h.CreatedAt,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan status history: %w", err)
+		}
+
+		if oldStatus.Valid {
+			h.OldStatus = &oldStatus.String
+		}
+
+		if changedBy.Valid {
+			h.ChangedBy = &changedBy.Int64
+		}
+
+		if changeReason.Valid {
+			h.ChangeReason = changeReason.String
+		}
+
+		history = append(history, h)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating status history: %w", err)
+	}
+
+	return history, nil
+}
+
+// GetOrderStats retrieves statistics for orders
+func (r *OrderRepository) GetOrderStats(tenantID, restaurantID int64, startDate, endDate time.Time) (*domain.OrderStats, error) {
+	// Total orders and revenue
+	query := `
+		SELECT
+			COUNT(*) as total_orders,
+			COALESCE(SUM(total_amount), 0) as total_revenue,
+			COALESCE(AVG(total_amount), 0) as average_order_value,
+			COUNT(CASE WHEN status = 'delivered' THEN 1 END) as delivered_count,
+			COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_count,
+			COUNT(CASE WHEN created_at >= CURRENT_DATE THEN 1 END) as delivered_today
+		FROM orders
+		WHERE tenant_id = $1 AND restaurant_id = $2
+		AND created_at >= $3 AND created_at <= $4
+	`
+
+	stats := &domain.OrderStats{
+		OrdersByStatus:        make(map[string]int64),
+		OrdersByPaymentMethod: make(map[string]int64),
+	}
+
+	var deliveredToday int64
+	err := r.db.QueryRow(query, tenantID, restaurantID, startDate, endDate).Scan(
+		&stats.TotalOrders,
+		&stats.TotalRevenue,
+		&stats.AverageOrderValue,
+		&stats.DeliveredCount,
+		&stats.PendingCount,
+		&deliveredToday,
+	)
+
+	if err != nil && err != sql.ErrNoRows {
+		return nil, fmt.Errorf("failed to get order stats: %w", err)
+	}
+
+	stats.DeliveredToday = deliveredToday
+
+	// Orders by status
+	statusQuery := `
+		SELECT status, COUNT(*) as count
+		FROM orders
+		WHERE tenant_id = $1 AND restaurant_id = $2
+		AND created_at >= $3 AND created_at <= $4
+		GROUP BY status
+	`
+
+	rows, err := r.db.Query(statusQuery, tenantID, restaurantID, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get status breakdown: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var status string
+		var count int64
+		err := rows.Scan(&status, &count)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan status breakdown: %w", err)
+		}
+		stats.OrdersByStatus[status] = count
+	}
+
+	// Orders by payment method
+	paymentQuery := `
+		SELECT payment_method, COUNT(*) as count
+		FROM orders
+		WHERE tenant_id = $1 AND restaurant_id = $2
+		AND created_at >= $3 AND created_at <= $4
+		AND payment_method IS NOT NULL
+		GROUP BY payment_method
+	`
+
+	rows, err = r.db.Query(paymentQuery, tenantID, restaurantID, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get payment method breakdown: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var method string
+		var count int64
+		err := rows.Scan(&method, &count)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan payment method breakdown: %w", err)
+		}
+		stats.OrdersByPaymentMethod[method] = count
+	}
+
+	return stats, nil
+}
+
+// DeleteOrder deletes an order (soft delete by cancelling it)
+func (r *OrderRepository) DeleteOrder(tenantID, restaurantID, orderID int64) error {
+	// We prefer to cancel orders rather than delete them for audit trail
+	return r.CancelOrder(tenantID, restaurantID, orderID, "Deleted by admin")
+}

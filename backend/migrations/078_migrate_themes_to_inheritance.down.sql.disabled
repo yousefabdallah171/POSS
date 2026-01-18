@@ -1,0 +1,35 @@
+-- Rollback: Migrate Existing Themes to Inheritance Model
+-- Date: January 4, 2026
+-- Purpose: Remove theme inheritance relationships and restore original state
+
+-- 1. Remove migration tracking column
+ALTER TABLE themes DROP COLUMN IF EXISTS migrated_to_inheritance;
+
+-- 2. Clear theme inheritance cache
+DELETE FROM theme_inheritance_cache;
+
+-- 3. Clear theme inheritance relationships
+DELETE FROM theme_inheritance
+WHERE theme_id IN (
+    SELECT t.id FROM themes t
+    WHERE t.slug != 'default'
+);
+
+-- 4. Remove default parent themes that were created during migration
+-- (Only remove if they have no other relationships)
+DELETE FROM themes
+WHERE slug = 'default'
+AND id NOT IN (
+    SELECT parent_theme_id FROM theme_inheritance WHERE parent_theme_id IS NOT NULL
+)
+AND id NOT IN (
+    SELECT t.id FROM themes t
+    WHERE EXISTS (
+        SELECT 1 FROM theme_inheritance ti WHERE ti.theme_id = t.id
+    )
+);
+
+-- 5. Verify rollback completion
+-- Check that no inheritance relationships exist
+SELECT COUNT(*) as remaining_inheritance_records
+FROM theme_inheritance;

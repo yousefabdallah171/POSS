@@ -1,0 +1,60 @@
+-- Component Registry System Tables
+-- Date: January 3, 2026
+
+-- Create component_registry table
+CREATE TABLE IF NOT EXISTS component_registry (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    component_id VARCHAR(100) NOT NULL UNIQUE,
+    version VARCHAR(20) NOT NULL DEFAULT '1.0.0',
+    aliases JSON,
+    category VARCHAR(50),
+    tags JSON,
+    schema JSON,
+    thumbnail_url VARCHAR(500),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_component_id ON component_registry(component_id);
+CREATE INDEX idx_category ON component_registry(category);
+CREATE INDEX idx_is_active ON component_registry(is_active);
+CREATE INDEX idx_created_at ON component_registry(created_at);
+
+-- Create component_theme_mapping table
+CREATE TABLE IF NOT EXISTS component_theme_mapping (
+    id VARCHAR(36) PRIMARY KEY,
+    theme_id VARCHAR(36) NOT NULL,
+    component_id VARCHAR(100) NOT NULL,
+    position INT NOT NULL DEFAULT 0,
+    is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    config JSON,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (theme_id, component_id),
+    FOREIGN KEY (theme_id) REFERENCES themes(id) ON DELETE CASCADE,
+    FOREIGN KEY (component_id) REFERENCES component_registry(component_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_theme_id ON component_theme_mapping(theme_id);
+CREATE INDEX idx_component_id ON component_theme_mapping(component_id);
+CREATE INDEX idx_position ON component_theme_mapping(position);
+
+-- Create component_version table for version history
+CREATE TABLE IF NOT EXISTS component_version (
+    id VARCHAR(36) PRIMARY KEY,
+    component_id VARCHAR(100) NOT NULL,
+    version VARCHAR(20) NOT NULL,
+    changes JSON,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (component_id, version),
+    FOREIGN KEY (component_id) REFERENCES component_registry(component_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_component_id ON component_version(component_id);
+CREATE INDEX idx_version ON component_version(version);

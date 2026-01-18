@@ -1,0 +1,128 @@
+-- Theme Inheritance System Tables
+-- Date: January 3, 2026
+-- Converted from MySQL to PostgreSQL syntax
+
+-- Add parent_theme_id to themes table (PostgreSQL doesn't support AFTER)
+ALTER TABLE themes ADD COLUMN IF NOT EXISTS parent_theme_id VARCHAR(36);
+
+-- Add foreign key constraint for parent_theme_id
+ALTER TABLE themes ADD CONSTRAINT IF NOT EXISTS fk_parent_theme FOREIGN KEY (parent_theme_id) REFERENCES themes(id) ON DELETE SET NULL;
+
+-- Create index (PostgreSQL syntax)
+CREATE INDEX IF NOT EXISTS idx_themes_parent_theme_id ON themes(parent_theme_id);
+
+-- Create theme_inheritance table
+CREATE TABLE IF NOT EXISTS theme_inheritance (
+    id VARCHAR(36) PRIMARY KEY,
+    theme_id VARCHAR(36) NOT NULL,
+    parent_theme_id VARCHAR(36) NOT NULL,
+    overrides JSONB,
+    inherit_level INT NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (theme_id, parent_theme_id),
+    FOREIGN KEY (theme_id) REFERENCES themes(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_theme_id) REFERENCES themes(id) ON DELETE CASCADE
+);
+
+-- Create indexes for theme_inheritance
+CREATE INDEX IF NOT EXISTS idx_theme_inheritance_theme_id ON theme_inheritance(theme_id);
+CREATE INDEX IF NOT EXISTS idx_theme_inheritance_parent_theme_id ON theme_inheritance(parent_theme_id);
+CREATE INDEX IF NOT EXISTS idx_theme_inheritance_inherit_level ON theme_inheritance(inherit_level);
+
+-- Add comments for theme_inheritance
+COMMENT ON TABLE theme_inheritance IS 'Theme inheritance relationships';
+COMMENT ON COLUMN theme_inheritance.theme_id IS 'Child theme';
+COMMENT ON COLUMN theme_inheritance.parent_theme_id IS 'Parent theme';
+COMMENT ON COLUMN theme_inheritance.overrides IS 'JSON object of overridden properties';
+COMMENT ON COLUMN theme_inheritance.inherit_level IS '0=direct child, 1=grandparent, etc.';
+
+-- Create trigger for updated_at on theme_inheritance
+CREATE OR REPLACE FUNCTION update_theme_inheritance_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER IF NOT EXISTS trigger_update_theme_inheritance_updated_at
+BEFORE UPDATE ON theme_inheritance
+FOR EACH ROW
+EXECUTE FUNCTION update_theme_inheritance_updated_at();
+
+-- Create theme_property_override table
+CREATE TABLE IF NOT EXISTS theme_property_override (
+    id VARCHAR(36) PRIMARY KEY,
+    theme_id VARCHAR(36) NOT NULL,
+    property_path VARCHAR(255) NOT NULL,
+    original_value JSONB,
+    override_value JSONB,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (theme_id, property_path),
+    FOREIGN KEY (theme_id) REFERENCES themes(id) ON DELETE CASCADE
+);
+
+-- Create indexes for theme_property_override
+CREATE INDEX IF NOT EXISTS idx_theme_property_override_theme_id ON theme_property_override(theme_id);
+CREATE INDEX IF NOT EXISTS idx_theme_property_override_property_path ON theme_property_override(property_path);
+
+-- Add comments for theme_property_override
+COMMENT ON TABLE theme_property_override IS 'Individual property overrides in theme inheritance';
+COMMENT ON COLUMN theme_property_override.theme_id IS 'Theme that has the override';
+COMMENT ON COLUMN theme_property_override.property_path IS 'JSON path to property (e.g., colors.primary)';
+COMMENT ON COLUMN theme_property_override.original_value IS 'Original value from parent';
+COMMENT ON COLUMN theme_property_override.override_value IS 'Overridden value';
+
+-- Create trigger for updated_at on theme_property_override
+CREATE OR REPLACE FUNCTION update_theme_property_override_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER IF NOT EXISTS trigger_update_theme_property_override_updated_at
+BEFORE UPDATE ON theme_property_override
+FOR EACH ROW
+EXECUTE FUNCTION update_theme_property_override_updated_at();
+
+-- Create theme_inheritance_cache table for caching resolved themes
+CREATE TABLE IF NOT EXISTS theme_inheritance_cache (
+    id VARCHAR(36) PRIMARY KEY,
+    theme_id VARCHAR(36) NOT NULL UNIQUE,
+    resolved_data JSONB NOT NULL,
+    cache_version INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (theme_id) REFERENCES themes(id) ON DELETE CASCADE
+);
+
+-- Create indexes for theme_inheritance_cache
+CREATE INDEX IF NOT EXISTS idx_theme_inheritance_cache_theme_id ON theme_inheritance_cache(theme_id);
+CREATE INDEX IF NOT EXISTS idx_theme_inheritance_cache_updated_at ON theme_inheritance_cache(updated_at);
+
+-- Add comments for theme_inheritance_cache
+COMMENT ON TABLE theme_inheritance_cache IS 'Cache for resolved themes (with inheritance applied)';
+COMMENT ON COLUMN theme_inheritance_cache.theme_id IS 'Theme being cached';
+COMMENT ON COLUMN theme_inheritance_cache.resolved_data IS 'Fully resolved theme data';
+
+-- Create trigger for updated_at on theme_inheritance_cache
+CREATE OR REPLACE FUNCTION update_theme_inheritance_cache_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER IF NOT EXISTS trigger_update_theme_inheritance_cache_updated_at
+BEFORE UPDATE ON theme_inheritance_cache
+FOR EACH ROW
+EXECUTE FUNCTION update_theme_inheritance_cache_updated_at();

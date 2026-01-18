@@ -1,0 +1,47 @@
+-- Migration: Create roles table
+-- Description: Defines roles that group permissions together
+-- Roles can be system-defined (immutable) or custom (tenant-specific)
+
+CREATE TABLE IF NOT EXISTS roles (
+  id BIGSERIAL PRIMARY KEY,
+  tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  is_system BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  -- Constraints
+  UNIQUE(tenant_id, name),
+  CHECK(name != '')
+);
+
+-- Indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_roles_tenant ON roles(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_roles_name ON roles(name);
+CREATE INDEX IF NOT EXISTS idx_roles_system ON roles(is_system);
+
+-- Insert system roles for existing tenants
+INSERT INTO roles (tenant_id, name, description, is_system)
+SELECT DISTINCT id, 'ADMIN', 'Full system administrator access', TRUE
+FROM tenants
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE roles.tenant_id = tenants.id AND name = 'ADMIN')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO roles (tenant_id, name, description, is_system)
+SELECT DISTINCT id, 'MANAGER', 'Manages restaurant/store operations', TRUE
+FROM tenants
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE roles.tenant_id = tenants.id AND name = 'MANAGER')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO roles (tenant_id, name, description, is_system)
+SELECT DISTINCT id, 'STAFF', 'Basic staff access with limited permissions', TRUE
+FROM tenants
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE roles.tenant_id = tenants.id AND name = 'STAFF')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO roles (tenant_id, name, description, is_system)
+SELECT DISTINCT id, 'VIEWER', 'Read-only access to dashboards and reports', TRUE
+FROM tenants
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE roles.tenant_id = tenants.id AND name = 'VIEWER')
+ON CONFLICT DO NOTHING;

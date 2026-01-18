@@ -1,0 +1,28 @@
+-- Rollback Migration 005: Remove Component Versioning System
+
+-- Drop triggers first
+DROP TRIGGER IF EXISTS trigger_update_component_compatibility_timestamp ON component_compatibility;
+DROP TRIGGER IF EXISTS trigger_update_component_versions_timestamp ON component_versions;
+DROP FUNCTION IF EXISTS update_component_versions_timestamp();
+
+-- Drop component_compatibility table (drop first due to foreign key references)
+DROP TABLE IF EXISTS component_compatibility;
+
+-- Drop component_versions table
+DROP TABLE IF EXISTS component_versions;
+
+-- Remove columns added to components table
+ALTER TABLE components DROP COLUMN IF EXISTS current_version;
+ALTER TABLE components DROP COLUMN IF EXISTS supported_version_range;
+
+-- Drop related indexes (should be auto-dropped with tables, but just in case)
+DROP INDEX IF EXISTS idx_component_versions_component_id;
+DROP INDEX IF EXISTS idx_component_versions_is_latest;
+DROP INDEX IF EXISTS idx_component_versions_is_deprecated;
+DROP INDEX IF EXISTS idx_component_versions_version_semver;
+DROP INDEX IF EXISTS idx_component_versions_created_at;
+DROP INDEX IF EXISTS idx_component_compatibility_source;
+DROP INDEX IF EXISTS idx_component_compatibility_target;
+DROP INDEX IF EXISTS idx_component_compatibility_compatible;
+DROP INDEX IF EXISTS idx_component_compatibility_auto_migrable;
+DROP INDEX IF EXISTS idx_components_current_version;

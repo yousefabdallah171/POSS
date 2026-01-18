@@ -1,0 +1,174 @@
+-- Migration: Enhance Tenant Isolation with Database-Level Constraints
+-- Description: Add CHECK constraints and FOREIGN KEY constraints to enforce tenant isolation at database level
+-- This ensures that even if application logic fails, the database prevents cross-tenant data access
+
+-- ============================================================================
+-- Section 1: Add CHECK constraints to ensure tenant_id is always > 0
+-- ============================================================================
+
+-- Products table
+ALTER TABLE IF EXISTS products ADD CONSTRAINT check_products_tenant_id CHECK (tenant_id > 0);
+
+-- Orders table
+ALTER TABLE IF EXISTS orders ADD CONSTRAINT check_orders_tenant_id CHECK (tenant_id > 0);
+
+-- Users table
+ALTER TABLE IF EXISTS users ADD CONSTRAINT check_users_tenant_id CHECK (tenant_id > 0);
+
+-- Roles table
+ALTER TABLE IF EXISTS roles ADD CONSTRAINT check_roles_tenant_id CHECK (tenant_id > 0);
+
+-- User roles junction table
+ALTER TABLE IF EXISTS user_roles ADD CONSTRAINT check_user_roles_tenant_id CHECK (tenant_id > 0);
+
+-- Permissions table (if exists)
+ALTER TABLE IF EXISTS permissions ADD CONSTRAINT check_permissions_tenant_id CHECK (tenant_id > 0);
+
+-- Categories table (if exists)
+ALTER TABLE IF EXISTS categories ADD CONSTRAINT check_categories_tenant_id CHECK (tenant_id > 0);
+
+-- Employees table (if exists)
+ALTER TABLE IF EXISTS employees ADD CONSTRAINT check_employees_tenant_id CHECK (tenant_id > 0);
+
+-- Leaves table (if exists)
+ALTER TABLE IF EXISTS leaves ADD CONSTRAINT check_leaves_tenant_id CHECK (tenant_id > 0);
+
+-- Salaries table (if exists)
+ALTER TABLE IF EXISTS salaries ADD CONSTRAINT check_salaries_tenant_id CHECK (tenant_id > 0);
+
+-- Notifications table (if exists)
+ALTER TABLE IF EXISTS notifications ADD CONSTRAINT check_notifications_tenant_id CHECK (tenant_id > 0);
+
+-- Themes table (if exists)
+ALTER TABLE IF EXISTS themes ADD CONSTRAINT check_themes_tenant_id CHECK (tenant_id > 0);
+
+-- Themes v2 table
+ALTER TABLE IF EXISTS themes_v2 ADD CONSTRAINT check_themes_v2_tenant_id CHECK (tenant_id > 0);
+
+-- Preferences table
+ALTER TABLE IF EXISTS preferences ADD CONSTRAINT check_preferences_tenant_id CHECK (tenant_id > 0);
+
+-- API Keys table (if exists)
+ALTER TABLE IF EXISTS api_keys ADD CONSTRAINT check_api_keys_tenant_id CHECK (tenant_id > 0);
+
+-- ============================================================================
+-- Section 2: Ensure FOREIGN KEY constraints exist on tenant_id
+-- ============================================================================
+
+-- Products table
+ALTER TABLE IF EXISTS products
+ADD CONSTRAINT IF NOT EXISTS fk_products_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Orders table
+ALTER TABLE IF EXISTS orders
+ADD CONSTRAINT IF NOT EXISTS fk_orders_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Users table (already has constraint, ensure it's there)
+ALTER TABLE IF EXISTS users
+ADD CONSTRAINT IF NOT EXISTS fk_users_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Roles table
+ALTER TABLE IF EXISTS roles
+ADD CONSTRAINT IF NOT EXISTS fk_roles_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- User roles table
+ALTER TABLE IF EXISTS user_roles
+ADD CONSTRAINT IF NOT EXISTS fk_user_roles_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Notifications table
+ALTER TABLE IF EXISTS notifications
+ADD CONSTRAINT IF NOT EXISTS fk_notifications_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Themes v2 table
+ALTER TABLE IF EXISTS themes_v2
+ADD CONSTRAINT IF NOT EXISTS fk_themes_v2_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Preferences table
+ALTER TABLE IF EXISTS preferences
+ADD CONSTRAINT IF NOT EXISTS fk_preferences_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- API Keys table
+ALTER TABLE IF EXISTS api_keys
+ADD CONSTRAINT IF NOT EXISTS fk_api_keys_tenant
+FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- ============================================================================
+-- Section 3: Create/Update Indexes for Fast Tenant Lookups
+-- ============================================================================
+
+-- Products
+CREATE INDEX IF NOT EXISTS idx_products_tenant_id ON products(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_products_tenant_name ON products(tenant_id, name);
+
+-- Orders
+CREATE INDEX IF NOT EXISTS idx_orders_tenant_id ON orders(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_orders_tenant_created ON orders(tenant_id, created_at);
+
+-- Users
+CREATE INDEX IF NOT EXISTS idx_users_tenant_id ON users(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_users_tenant_email ON users(tenant_id, email);
+
+-- Roles
+CREATE INDEX IF NOT EXISTS idx_roles_tenant_id ON roles(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_roles_tenant_name ON roles(tenant_id, name);
+
+-- User Roles
+CREATE INDEX IF NOT EXISTS idx_user_roles_tenant_id ON user_roles(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_tenant_user ON user_roles(tenant_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_tenant_role ON user_roles(tenant_id, role_id);
+
+-- Notifications
+CREATE INDEX IF NOT EXISTS idx_notifications_tenant_id ON notifications(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_tenant_user ON notifications(tenant_id, user_id);
+
+-- Themes
+CREATE INDEX IF NOT EXISTS idx_themes_v2_tenant_id ON themes_v2(tenant_id);
+
+-- Preferences
+CREATE INDEX IF NOT EXISTS idx_preferences_tenant_id ON preferences(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_preferences_tenant_user ON preferences(tenant_id, user_id);
+
+-- ============================================================================
+-- Section 4: Verify Tenant Isolation Integrity
+-- ============================================================================
+
+-- Log any existing records with tenant_id = 0 or NULL (should be none)
+-- This query can be run manually to find problematic records:
+-- SELECT 'products' as table_name, COUNT(*) as count FROM products WHERE tenant_id IS NULL OR tenant_id <= 0
+-- UNION ALL
+-- SELECT 'orders' as table_name, COUNT(*) as count FROM orders WHERE tenant_id IS NULL OR tenant_id <= 0
+-- UNION ALL
+-- ... etc for all tables
+
+-- ============================================================================
+-- Section 5: Documentation Comments
+-- ============================================================================
+
+-- CRITICAL SECURITY NOTES:
+-- 1. All multi-tenant tables MUST have:
+--    - CHECK constraint: tenant_id > 0
+--    - FOREIGN KEY constraint: tenant_id REFERENCES tenants(id) ON DELETE CASCADE
+--    - Index on tenant_id for query performance
+--
+-- 2. Application queries MUST include WHERE tenant_id = $X filter
+--
+-- 3. When adding new tables, always include:
+--    - tenant_id BIGINT NOT NULL column
+--    - CHECK constraint
+--    - FOREIGN KEY constraint
+--    - Index on tenant_id
+--
+-- 4. Database-level constraints provide defense-in-depth:
+--    - CHECK prevents invalid tenant_id values
+--    - FOREIGN KEY ensures referential integrity
+--    - Indexes ensure queries are fast despite constraint checking
+--
+-- 5. Never remove these constraints without explicit security review
