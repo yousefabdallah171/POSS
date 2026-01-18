@@ -1,0 +1,126 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: pos-postgres
+    hostname: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pos_saas
+      POSTGRES_INITDB_ARGS: "-c max_connections=200"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - pos-network
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      cache_from:
+        - pos-backend:latest
+    image: pos-backend:latest
+    container_name: pos-backend
+    hostname: backend
+    environment:
+      # Server Configuration
+      PORT: 8080
+      ENV: production
+
+      # Database Configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: pos_saas
+      DB_SSLMODE: disable
+      DB_MAX_CONNECTIONS: 25
+      DB_IDLE_CONNECTIONS: 5
+      DB_CONNECTION_TIMEOUT: 30s
+
+      # JWT Configuration
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-2024
+      JWT_EXPIRY: 24h
+
+      # Logging
+      LOG_LEVEL: info
+
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Frontend Dashboard (commented out for now)
+  # dashboard:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dashboard
+  #   container_name: pos-dashboard
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: http://localhost:8080/api/v1
+  #     NODE_ENV: production
+  #   ports:
+  #     - "3002:3000"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - pos-network
+  #   restart: unless-stopped
+
+  # Optional: Frontend Landing Page (commented out for now)
+  # landing:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.landing
+  #   container_name: pos-landing
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: http://localhost:8080/api/v1
+  #     NODE_ENV: production
+  #   ports:
+  #     - "3001:3000"
+  #   networks:
+  #     - pos-network
+  #   restart: unless-stopped
+
+networks:
+  pos-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local

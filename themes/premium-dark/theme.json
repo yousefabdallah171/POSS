@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "name": "Premium Dark",
+    "slug": "premium-dark",
+    "version": "1.0.0",
+    "author": "POS SaaS Team",
+    "description": "Luxurious dark theme with gold accents. Designed for high-end restaurants and exclusive dining concepts.",
+    "category": "luxury",
+    "tags": ["dark", "premium", "luxury", "exclusive"],
+    "preview": "preview.png",
+    "created_at": "2025-01-09",
+    "bilingual": true
+  },
+  "identity": {
+    "siteTitle": { "en": "Premium Dark", "ar": "أسود فاخر" },
+    "logoUrl": "",
+    "faviconUrl": "",
+    "domain": ""
+  },
+  "colors": {
+    "primary": "#d4af37",
+    "secondary": "#c5a028",
+    "accent": "#f0e68c",
+    "background": "#1a1a1a",
+    "text": "#f5f5f5",
+    "border": "#333333",
+    "shadow": "#000000"
+  },
+  "typography": {
+    "fontFamily": "Montserrat, system-ui, sans-serif",
+    "baseFontSize": 16,
+    "lineHeight": 1.7,
+    "borderRadius": 4,
+    "headings": {
+      "h1": { "size": 52, "weight": 300 },
+      "h2": { "size": 40, "weight": 300 },
+      "h3": { "size": 28, "weight": 400 }
+    }
+  },
+  "header": {
+    "style": "elegant",
+    "layout": "horizontal",
+    "position": "fixed",
+    "height": 70,
+    "padding": 20,
+    "backgroundColor": "#1a1a1a",
+    "textColor": "#d4af37",
+    "logoPosition": "left",
+    "showLogo": true,
+    "showSearch": false,
+    "showLanguageSwitcher": true,
+    "navigationItems": [
+      { "id": "nav-1", "label": { "en": "Home", "ar": "الرئيسية" }, "href": "/", "order": 1 },
+      { "id": "nav-2", "label": { "en": "Menu", "ar": "القائمة" }, "href": "/menu", "order": 2 },
+      { "id": "nav-3", "label": { "en": "About", "ar": "من نحن" }, "href": "/about", "order": 3 },
+      { "id": "nav-4", "label": { "en": "Reserve", "ar": "احجز" }, "href": "/reservations", "order": 4 }
+    ],
+    "ctaButton": {
+      "text": { "en": "Reserve", "ar": "احجز" },
+      "href": "/reservations",
+      "style": "primary"
+    }
+  },
+  "footer": {
+    "style": "minimal",
+    "layout": "multi-column",
+    "columns": 3,
+    "backgroundColor": "#0d0d0d",
+    "textColor": "#d4af37",
+    "linkColor": "#f0e68c",
+    "showBackToTop": false,
+    "companyInfo": {
+      "name": { "en": "The Prestige", "ar": "البريستيج" },
+      "description": { "en": "An exclusive culinary experience", "ar": "تجربة طهي حصرية" },
+      "address": "789 Luxury Lane, Elite City, State 11111",
+      "phone": "+1 (555) 999-9999",
+      "email": "reservations@theprestige.com"
+    },
+    "sections": [
+      {
+        "id": "section-1",
+        "title": { "en": "Hours", "ar": "ساعات العمل" },
+        "content": { "en": "By Reservation Only\nTue-Sat: 6pm-11pm", "ar": "بالحجز فقط\nالثلاثاء-السبت: 6م-11م" }
+      }
+    ],
+    "socialLinks": [
+      { "platform": "facebook", "url": "https://facebook.com", "icon": "facebook" },
+      { "platform": "instagram", "url": "https://instagram.com", "icon": "instagram" }
+    ],
+    "legalLinks": [
+      { "label": { "en": "Privacy Policy", "ar": "سياسة الخصوصية" }, "href": "/privacy" },
+      { "label": { "en": "Terms", "ar": "الشروط" }, "href": "/terms" }
+    ],
+    "copyrightText": {
+      "en": "© 2025 The Prestige. Exclusivity Redefined.",
+      "ar": "© 2025 البريستيج. الحصرية معاد تعريفها."
+    }
+  },
+  "components": [
+    {
+      "id": "hero-1",
+      "type": "hero",
+      "enabled": true,
+      "order": 1,
+      "title": { "en": "Hero Section", "ar": "القسم البطل" },
+      "config": {
+        "layout": "full-screen",
+        "style": "overlay",
+        "title": { "en": "The Prestige", "ar": "البريستيج" },
+        "subtitle": { "en": "Experience unparalleled culinary excellence", "ar": "اختبر التميز الطهي الذي لا مثيل له" },
+        "backgroundImage": "https://images.unsplash.com/photo-1559027615-cd4628902d4a",
+        "overlayOpacity": 0.7,
+        "textAlignment": "center",
+        "textColor": "#d4af37",
+        "height": "700px",
+        "ctaButtons": [
+          { "text": { "en": "Make Reservation", "ar": "احجز الآن" }, "href": "/reservations", "style": "primary" }
+        ]
+      }
+    },
+    {
+      "id": "featured-1",
+      "type": "featured-items",
+      "enabled": true,
+      "order": 2,
+      "title": { "en": "Chef's Selection", "ar": "اختيار الطاهي" },
+      "config": {
+        "layout": "grid",
+        "columns": 2,
+        "showPrices": true,
+        "showImages": true,
+        "itemsPerRow": 2,
+        "title": { "en": "Exclusive Menu Items", "ar": "عناصر القائمة الحصرية" },
+        "description": { "en": "Carefully crafted by our master chefs", "ar": "تم إعدادها بعناية من قبل طهاتنا الرئيسيين" }
+      }
+    },
+    {
+      "id": "why-us-1",
+      "type": "why-choose-us",
+      "enabled": true,
+      "order": 3,
+      "title": { "en": "Why Choose Us", "ar": "لماذا تختارنا" },
+      "config": {
+        "layout": "grid",
+        "columns": 3,
+        "items": [
+          { "icon": "👑", "title": { "en": "Exclusive", "ar": "حصري" }, "description": { "en": "Limited seating", "ar": "مقاعد محدودة" } },
+          { "icon": "🏆", "title": { "en": "Award-Winning", "ar": "حائز على جوائز" }, "description": { "en": "Michelin certified", "ar": "معتمد من ميشلان" } },
+          { "icon": "💎", "title": { "en": "Excellence", "ar": "التميز" }, "description": { "en": "Unmatched quality", "ar": "جودة لا تضاهى" } }
+        ]
+      }
+    }
+  ],
+  "customization": {
+    "allowColorChange": true,
+    "allowFontChange": false,
+    "allowLayoutChange": false,
+    "allowComponentReorder": true,
+    "allowComponentDisable": false
+  }
+}

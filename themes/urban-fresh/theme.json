@@ -1,0 +1,190 @@
+{
+  "meta": {
+    "name": "Urban Fresh",
+    "slug": "urban-fresh",
+    "version": "1.0.0",
+    "author": "POS SaaS Team",
+    "description": "Contemporary urban design with trendy colors and modern typography. Perfect for health-conscious restaurants, juice bars, and modern cafes.",
+    "category": "modern",
+    "tags": ["urban", "modern", "fresh", "health"],
+    "preview": "preview.png",
+    "created_at": "2025-01-09",
+    "bilingual": true
+  },
+  "identity": {
+    "siteTitle": { "en": "Urban Fresh", "ar": "طازة حضرية" },
+    "logoUrl": "",
+    "faviconUrl": "",
+    "domain": ""
+  },
+  "colors": {
+    "primary": "#16a34a",
+    "secondary": "#15803d",
+    "accent": "#22c55e",
+    "background": "#f0fdf4",
+    "text": "#1f2937",
+    "border": "#dcfce7",
+    "shadow": "#166534"
+  },
+  "typography": {
+    "fontFamily": "Sora, system-ui, sans-serif",
+    "baseFontSize": 15,
+    "lineHeight": 1.6,
+    "borderRadius": 8,
+    "headings": {
+      "h1": { "size": 46, "weight": 700 },
+      "h2": { "size": 34, "weight": 700 },
+      "h3": { "size": 24, "weight": 600 }
+    }
+  },
+  "header": {
+    "style": "modern",
+    "layout": "horizontal",
+    "position": "sticky",
+    "height": 64,
+    "padding": 16,
+    "backgroundColor": "#16a34a",
+    "textColor": "#ffffff",
+    "logoPosition": "left",
+    "showLogo": true,
+    "showSearch": true,
+    "showLanguageSwitcher": true,
+    "navigationItems": [
+      { "id": "nav-1", "label": { "en": "Home", "ar": "الرئيسية" }, "href": "/", "order": 1 },
+      { "id": "nav-2", "label": { "en": "Menu", "ar": "القائمة" }, "href": "/menu", "order": 2 },
+      { "id": "nav-3", "label": { "en": "Values", "ar": "القيم" }, "href": "/values", "order": 3 },
+      { "id": "nav-4", "label": { "en": "Orders", "ar": "الطلبات" }, "href": "/orders", "order": 4 }
+    ],
+    "ctaButton": {
+      "text": { "en": "Order Now", "ar": "اطلب الآن" },
+      "href": "/order",
+      "style": "primary"
+    }
+  },
+  "footer": {
+    "style": "extended",
+    "layout": "multi-column",
+    "columns": 4,
+    "backgroundColor": "#1f2937",
+    "textColor": "#f0fdf4",
+    "linkColor": "#22c55e",
+    "showBackToTop": true,
+    "companyInfo": {
+      "name": { "en": "Fresh Urban", "ar": "حضر طازة" },
+      "description": { "en": "Healthy eating made easy", "ar": "الأكل الصحي سهل" },
+      "address": "567 Green Lane, Metro City, State 11222",
+      "phone": "(555) 222-GREENS",
+      "email": "hello@freshurban.com"
+    },
+    "sections": [
+      {
+        "id": "section-1",
+        "title": { "en": "Menu", "ar": "القائمة" },
+        "links": [
+          { "label": { "en": "Bowls", "ar": "الوعاء" }, "href": "/menu/bowls" },
+          { "label": { "en": "Smoothies", "ar": "العصائر" }, "href": "/menu/smoothies" },
+          { "label": { "en": "Salads", "ar": "السلطات" }, "href": "/menu/salads" }
+        ]
+      },
+      {
+        "id": "section-2",
+        "title": { "en": "Locations", "ar": "الفروع" },
+        "links": [
+          { "label": { "en": "Downtown", "ar": "وسط البلد" }, "href": "/locations/downtown" },
+          { "label": { "en": "Airport", "ar": "المطار" }, "href": "/locations/airport" },
+          { "label": { "en": "Mall", "ar": "المول" }, "href": "/locations/mall" }
+        ]
+      }
+    ],
+    "socialLinks": [
+      { "platform": "instagram", "url": "https://instagram.com", "icon": "instagram" },
+      { "platform": "facebook", "url": "https://facebook.com", "icon": "facebook" }
+    ],
+    "legalLinks": [
+      { "label": { "en": "Nutrition Info", "ar": "معلومات التغذية" }, "href": "/nutrition" },
+      { "label": { "en": "Privacy", "ar": "الخصوصية" }, "href": "/privacy" }
+    ],
+    "copyrightText": {
+      "en": "© 2025 Fresh Urban. Eat Well.",
+      "ar": "© 2025 حضر طازة. كل بشكل جيد."
+    }
+  },
+  "components": [
+    {
+      "id": "hero-1",
+      "type": "hero",
+      "enabled": true,
+      "order": 1,
+      "title": { "en": "Hero Section", "ar": "القسم البطل" },
+      "config": {
+        "layout": "full-screen",
+        "style": "overlay",
+        "title": { "en": "Eat Fresh. Feel Better.", "ar": "كل طازة. شعر أفضل." },
+        "subtitle": { "en": "Healthy food delivered in 30 minutes", "ar": "الطعام الصحي يوصل في 30 دقيقة" },
+        "backgroundImage": "https://images.unsplash.com/photo-1495479459705-2e60e6a42e45",
+        "overlayOpacity": 0.2,
+        "textAlignment": "center",
+        "textColor": "#ffffff",
+        "height": "560px",
+        "ctaButtons": [
+          { "text": { "en": "Order Now", "ar": "اطلب الآن" }, "href": "/order", "style": "primary" },
+          { "text": { "en": "View Menu", "ar": "عرض القائمة" }, "href": "/menu", "style": "secondary" }
+        ]
+      }
+    },
+    {
+      "id": "featured-1",
+      "type": "featured-items",
+      "enabled": true,
+      "order": 2,
+      "title": { "en": "Best Sellers", "ar": "الأكثر مبيعاً" },
+      "config": {
+        "layout": "grid",
+        "columns": 4,
+        "showPrices": true,
+        "showImages": true,
+        "itemsPerRow": 4,
+        "title": { "en": "Most Popular", "ar": "الأكثر شهرة" },
+        "description": { "en": "Customer favorites packed with nutrients", "ar": "مفضلات العملاء غنية بالعناصر الغذائية" }
+      }
+    },
+    {
+      "id": "why-us-1",
+      "type": "why-choose-us",
+      "enabled": true,
+      "order": 3,
+      "title": { "en": "Why Fresh Urban", "ar": "لماذا حضر طازة" },
+      "config": {
+        "layout": "grid",
+        "columns": 3,
+        "items": [
+          { "icon": "🥗", "title": { "en": "100% Fresh", "ar": "100٪ طازة" }, "description": { "en": "Daily sourced ingredients", "ar": "مكونات يومية المصدر" } },
+          { "icon": "⚡", "title": { "en": "Fast Delivery", "ar": "توصيل سريع" }, "description": { "en": "30 minutes guaranteed", "ar": "30 دقيقة مضمونة" } },
+          { "icon": "❤️", "title": { "en": "Healthy", "ar": "صحي" }, "description": { "en": "No artificial additives", "ar": "بدون إضافات صناعية" } }
+        ]
+      }
+    },
+    {
+      "id": "cta-1",
+      "type": "cta",
+      "enabled": true,
+      "order": 4,
+      "title": { "en": "Start Eating Better", "ar": "ابدأ بالأكل بشكل أفضل" },
+      "config": {
+        "layout": "centered",
+        "backgroundColor": "#16a34a",
+        "textColor": "#ffffff",
+        "title": { "en": "Order Your Healthy Meal Today", "ar": "اطلب وجبتك الصحية اليوم" },
+        "description": { "en": "Delivered fresh to your door", "ar": "يتم توصيله طازاً إلى باب بيتك" },
+        "button": { "text": { "en": "Start Ordering", "ar": "ابدأ الطلب" }, "href": "/order", "style": "light" }
+      }
+    }
+  ],
+  "customization": {
+    "allowColorChange": true,
+    "allowFontChange": true,
+    "allowLayoutChange": true,
+    "allowComponentReorder": true,
+    "allowComponentDisable": true
+  }
+}

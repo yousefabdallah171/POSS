@@ -1,0 +1,181 @@
+{
+  "meta": {
+    "name": "Spicy Fusion",
+    "slug": "spicy-fusion",
+    "version": "1.0.0",
+    "author": "POS SaaS Team",
+    "description": "Vibrant and bold design with fiery colors. Perfect for Asian, Indian, and fusion restaurants.",
+    "category": "playful",
+    "tags": ["spicy", "fusion", "asian", "bold"],
+    "preview": "preview.png",
+    "created_at": "2025-01-09",
+    "bilingual": true
+  },
+  "identity": {
+    "siteTitle": { "en": "Spicy Fusion", "ar": "حار الاندماج" },
+    "logoUrl": "",
+    "faviconUrl": "",
+    "domain": ""
+  },
+  "colors": {
+    "primary": "#dc2626",
+    "secondary": "#f97316",
+    "accent": "#fbbf24",
+    "background": "#1f2937",
+    "text": "#f3f4f6",
+    "border": "#4b5563",
+    "shadow": "#000000"
+  },
+  "typography": {
+    "fontFamily": "Manrope, system-ui, sans-serif",
+    "baseFontSize": 15,
+    "lineHeight": 1.5,
+    "borderRadius": 10,
+    "headings": {
+      "h1": { "size": 48, "weight": 800 },
+      "h2": { "size": 36, "weight": 800 },
+      "h3": { "size": 24, "weight": 700 }
+    }
+  },
+  "header": {
+    "style": "modern",
+    "layout": "horizontal",
+    "position": "sticky",
+    "height": 70,
+    "padding": 18,
+    "backgroundColor": "#dc2626",
+    "textColor": "#fefce8",
+    "logoPosition": "left",
+    "showLogo": true,
+    "showSearch": true,
+    "showLanguageSwitcher": true,
+    "navigationItems": [
+      { "id": "nav-1", "label": { "en": "Home", "ar": "الرئيسية" }, "href": "/", "order": 1 },
+      { "id": "nav-2", "label": { "en": "Menu", "ar": "القائمة" }, "href": "/menu", "order": 2 },
+      { "id": "nav-3", "label": { "en": "Heat Levels", "ar": "مستويات الحرارة" }, "href": "/heat", "order": 3 },
+      { "id": "nav-4", "label": { "en": "Delivery", "ar": "التوصيل" }, "href": "/delivery", "order": 4 }
+    ],
+    "ctaButton": {
+      "text": { "en": "Order Now", "ar": "اطلب الآن" },
+      "href": "/order",
+      "style": "primary"
+    }
+  },
+  "footer": {
+    "style": "extended",
+    "layout": "multi-column",
+    "columns": 4,
+    "backgroundColor": "#1f2937",
+    "textColor": "#fbbf24",
+    "linkColor": "#fbbf24",
+    "showBackToTop": true,
+    "companyInfo": {
+      "name": { "en": "Spicy Fusion Kitchen", "ar": "مطبخ الاندماج الحار" },
+      "description": { "en": "Where heat meets flavor", "ar": "حيث يلتقي الحرارة بالنكهة" },
+      "address": "100 Fire Street, Hot City, State 77777",
+      "phone": "(555) 777-HEAT",
+      "email": "order@spicyfusion.com"
+    },
+    "sections": [
+      {
+        "id": "section-1",
+        "title": { "en": "Popular Items", "ar": "العناصر الشهيرة" },
+        "links": [
+          { "label": { "en": "Thai Curries", "ar": "الكاري التايلاندي" }, "href": "/menu/thai" },
+          { "label": { "en": "Indian Spices", "ar": "البهارات الهندية" }, "href": "/menu/indian" },
+          { "label": { "en": "Asian Fusion", "ar": "الاندماج الآسيوي" }, "href": "/menu/fusion" }
+        ]
+      }
+    ],
+    "socialLinks": [
+      { "platform": "instagram", "url": "https://instagram.com", "icon": "instagram" },
+      { "platform": "facebook", "url": "https://facebook.com", "icon": "facebook" }
+    ],
+    "legalLinks": [
+      { "label": { "en": "Allergens", "ar": "المواد المسببة للحساسية" }, "href": "/allergens" },
+      { "label": { "en": "Privacy", "ar": "الخصوصية" }, "href": "/privacy" }
+    ],
+    "copyrightText": {
+      "en": "© 2025 Spicy Fusion. Feel the Heat!",
+      "ar": "© 2025 حار الاندماج. شعر بالحرارة!"
+    }
+  },
+  "components": [
+    {
+      "id": "hero-1",
+      "type": "hero",
+      "enabled": true,
+      "order": 1,
+      "title": { "en": "Hero Section", "ar": "القسم البطل" },
+      "config": {
+        "layout": "full-screen",
+        "style": "overlay",
+        "title": { "en": "Feel the Heat", "ar": "شعر بالحرارة" },
+        "subtitle": { "en": "Bold flavors, fiery spices, unforgettable taste", "ar": "نكهات جريئة وتوابل حارة وطعم لا ينسى" },
+        "backgroundImage": "https://images.unsplash.com/photo-1588166524941-3bf0c23a0aa5",
+        "overlayOpacity": 0.5,
+        "textAlignment": "center",
+        "textColor": "#fefce8",
+        "height": "580px",
+        "ctaButtons": [
+          { "text": { "en": "Order Online", "ar": "اطلب أون لاين" }, "href": "/order", "style": "primary" },
+          { "text": { "en": "View Menu", "ar": "عرض القائمة" }, "href": "/menu", "style": "secondary" }
+        ]
+      }
+    },
+    {
+      "id": "featured-1",
+      "type": "featured-items",
+      "enabled": true,
+      "order": 2,
+      "title": { "en": "Trending Now", "ar": "الشائع الآن" },
+      "config": {
+        "layout": "grid",
+        "columns": 4,
+        "showPrices": true,
+        "showImages": true,
+        "itemsPerRow": 4,
+        "title": { "en": "Hot Picks", "ar": "الاختيارات الساخنة" },
+        "description": { "en": "Most ordered right now", "ar": "الأكثر طلباً الآن" }
+      }
+    },
+    {
+      "id": "why-us-1",
+      "type": "why-choose-us",
+      "enabled": true,
+      "order": 3,
+      "title": { "en": "Why Us", "ar": "لماذا نحن" },
+      "config": {
+        "layout": "grid",
+        "columns": 3,
+        "items": [
+          { "icon": "🌶️", "title": { "en": "Authentic Spices", "ar": "التوابل الأصلية" }, "description": { "en": "Imported daily", "ar": "مستوردة يومياً" } },
+          { "icon": "⚡", "title": { "en": "Quick Service", "ar": "خدمة سريعة" }, "description": { "en": "30-minute delivery", "ar": "توصيل في 30 دقيقة" } },
+          { "icon": "🔥", "title": { "en": "Customizable Heat", "ar": "حرارة قابلة للتخصيص" }, "description": { "en": "Choose your level", "ar": "اختر مستويك" } }
+        ]
+      }
+    },
+    {
+      "id": "cta-1",
+      "type": "cta",
+      "enabled": true,
+      "order": 4,
+      "title": { "en": "Order Now", "ar": "اطلب الآن" },
+      "config": {
+        "layout": "centered",
+        "backgroundColor": "#dc2626",
+        "textColor": "#fefce8",
+        "title": { "en": "Ready for the Challenge?", "ar": "هل أنت مستعد للتحدي؟" },
+        "description": { "en": "Get your spicy fix delivered fast", "ar": "احصل على وجبتك الحارة بسرعة" },
+        "button": { "text": { "en": "Order Online", "ar": "اطلب أون لاين" }, "href": "/order", "style": "light" }
+      }
+    }
+  ],
+  "customization": {
+    "allowColorChange": true,
+    "allowFontChange": true,
+    "allowLayoutChange": true,
+    "allowComponentReorder": true,
+    "allowComponentDisable": true
+  }
+}

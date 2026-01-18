@@ -1,0 +1,189 @@
+{
+  "meta": {
+    "name": "Fresh Green",
+    "slug": "fresh-green",
+    "version": "1.0.0",
+    "author": "POS SaaS Team",
+    "description": "Vibrant green theme with natural vibes. Perfect for health food restaurants, juice bars, and eco-conscious eateries.",
+    "category": "modern",
+    "tags": ["green", "fresh", "organic", "eco"],
+    "preview": "preview.png",
+    "created_at": "2025-01-09",
+    "bilingual": true
+  },
+  "identity": {
+    "siteTitle": { "en": "Fresh Green", "ar": "أخضر طازج" },
+    "logoUrl": "",
+    "faviconUrl": "",
+    "domain": ""
+  },
+  "colors": {
+    "primary": "#059669",
+    "secondary": "#10b981",
+    "accent": "#34d399",
+    "background": "#ecfdf5",
+    "text": "#064e3b",
+    "border": "#a7f3d0",
+    "shadow": "#047857"
+  },
+  "typography": {
+    "fontFamily": "Sora, system-ui, sans-serif",
+    "baseFontSize": 15,
+    "lineHeight": 1.6,
+    "borderRadius": 12,
+    "headings": {
+      "h1": { "size": 48, "weight": 700 },
+      "h2": { "size": 36, "weight": 700 },
+      "h3": { "size": 26, "weight": 600 }
+    }
+  },
+  "header": {
+    "style": "modern",
+    "layout": "horizontal",
+    "position": "sticky",
+    "height": 66,
+    "padding": 16,
+    "backgroundColor": "#059669",
+    "textColor": "#ecfdf5",
+    "logoPosition": "left",
+    "showLogo": true,
+    "showSearch": true,
+    "showLanguageSwitcher": true,
+    "navigationItems": [
+      { "id": "nav-1", "label": { "en": "Home", "ar": "الرئيسية" }, "href": "/", "order": 1 },
+      { "id": "nav-2", "label": { "en": "Menu", "ar": "القائمة" }, "href": "/menu", "order": 2 },
+      { "id": "nav-3", "label": { "en": "Values", "ar": "القيم" }, "href": "/values", "order": 3 },
+      { "id": "nav-4", "label": { "en": "Contact", "ar": "اتصل بنا" }, "href": "/contact", "order": 4 }
+    ],
+    "ctaButton": {
+      "text": { "en": "Order Now", "ar": "اطلب الآن" },
+      "href": "/order",
+      "style": "primary"
+    }
+  },
+  "footer": {
+    "style": "extended",
+    "layout": "multi-column",
+    "columns": 4,
+    "backgroundColor": "#064e3b",
+    "textColor": "#ecfdf5",
+    "linkColor": "#34d399",
+    "showBackToTop": true,
+    "companyInfo": {
+      "name": { "en": "Green Plate", "ar": "الطبق الأخضر" },
+      "description": { "en": "Healthy, organic, sustainable", "ar": "صحي وعضوي ومستدام" },
+      "address": "555 Eco Lane, Green City, State 22222",
+      "phone": "(555) 555-GREEN",
+      "email": "hello@greenplate.com"
+    },
+    "sections": [
+      {
+        "id": "section-1",
+        "title": { "en": "Menu Categories", "ar": "فئات القائمة" },
+        "links": [
+          { "label": { "en": "Bowls", "ar": "الوعاء" }, "href": "/menu/bowls" },
+          { "label": { "en": "Salads", "ar": "السلطات" }, "href": "/menu/salads" },
+          { "label": { "en": "Juices", "ar": "العصائر" }, "href": "/menu/juices" }
+        ]
+      },
+      {
+        "id": "section-2",
+        "title": { "en": "Sustainability", "ar": "الاستدامة" },
+        "links": [
+          { "label": { "en": "Our Promise", "ar": "وعدنا" }, "href": "/promise" },
+          { "label": { "en": "Green Initiatives", "ar": "المبادرات الخضراء" }, "href": "/initiatives" }
+        ]
+      }
+    ],
+    "socialLinks": [
+      { "platform": "instagram", "url": "https://instagram.com", "icon": "instagram" },
+      { "platform": "facebook", "url": "https://facebook.com", "icon": "facebook" }
+    ],
+    "legalLinks": [
+      { "label": { "en": "Sustainability Report", "ar": "تقرير الاستدامة" }, "href": "/sustainability" },
+      { "label": { "en": "Privacy", "ar": "الخصوصية" }, "href": "/privacy" }
+    ],
+    "copyrightText": {
+      "en": "© 2025 Green Plate. Nourish Responsibly.",
+      "ar": "© 2025 الطبق الأخضر. تغذي بمسؤولية."
+    }
+  },
+  "components": [
+    {
+      "id": "hero-1",
+      "type": "hero",
+      "enabled": true,
+      "order": 1,
+      "title": { "en": "Hero Section", "ar": "القسم البطل" },
+      "config": {
+        "layout": "full-screen",
+        "style": "overlay",
+        "title": { "en": "Eat Green. Live Better.", "ar": "كل أخضر. عيش أفضل." },
+        "subtitle": { "en": "Organic, sustainable, delicious food", "ar": "طعام عضوي ومستدام ولذيذ" },
+        "backgroundImage": "https://images.unsplash.com/photo-1495735687605-333bb10de5a7",
+        "overlayOpacity": 0.25,
+        "textAlignment": "center",
+        "textColor": "#ecfdf5",
+        "height": "560px",
+        "ctaButtons": [
+          { "text": { "en": "View Menu", "ar": "عرض القائمة" }, "href": "/menu", "style": "primary" },
+          { "text": { "en": "Order Now", "ar": "اطلب الآن" }, "href": "/order", "style": "secondary" }
+        ]
+      }
+    },
+    {
+      "id": "featured-1",
+      "type": "featured-items",
+      "enabled": true,
+      "order": 2,
+      "title": { "en": "Popular Picks", "ar": "الخيارات الشهيرة" },
+      "config": {
+        "layout": "grid",
+        "columns": 4,
+        "showPrices": true,
+        "showImages": true,
+        "itemsPerRow": 4,
+        "title": { "en": "Best Sellers", "ar": "الأكثر مبيعاً" },
+        "description": { "en": "Customer favorites", "ar": "مفضلات العملاء" }
+      }
+    },
+    {
+      "id": "why-us-1",
+      "type": "why-choose-us",
+      "enabled": true,
+      "order": 3,
+      "title": { "en": "Our Commitment", "ar": "التزامنا" },
+      "config": {
+        "layout": "grid",
+        "columns": 3,
+        "items": [
+          { "icon": "🌿", "title": { "en": "100% Organic", "ar": "100٪ عضوي" }, "description": { "en": "Certified ingredients", "ar": "مكونات معتمدة" } },
+          { "icon": "♻️", "title": { "en": "Eco-Friendly", "ar": "صديق للبيئة" }, "description": { "en": "Sustainable packaging", "ar": "تغليف مستدام" } },
+          { "icon": "❤️", "title": { "en": "Health First", "ar": "الصحة أولاً" }, "description": { "en": "No preservatives", "ar": "بدون مواد حافظة" } }
+        ]
+      }
+    },
+    {
+      "id": "cta-1",
+      "type": "cta",
+      "enabled": true,
+      "order": 4,
+      "title": { "en": "Join the Green Movement", "ar": "انضم إلى الحركة الخضراء" },
+      "config": {
+        "layout": "centered",
+        "backgroundColor": "#059669",
+        "textColor": "#ecfdf5",
+        "title": { "en": "Make a Difference with Every Meal", "ar": "احدث فرقاً مع كل وجبة" },
+        "description": { "en": "Choose health, choose sustainability", "ar": "اختر الصحة، اختر الاستدامة" },
+        "button": { "text": { "en": "Order Healthy Today", "ar": "اطلب صحي اليوم" }, "href": "/order", "style": "light" }
+      }
+    }
+  ],
+  "customization": {
+    "allowColorChange": true,
+    "allowFontChange": true,
+    "allowLayoutChange": true,
+    "allowComponentReorder": true,
+    "allowComponentDisable": true
+  }
+}
