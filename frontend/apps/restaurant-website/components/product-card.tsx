@@ -65,19 +65,12 @@ function ProductCardComponent({
 
   return (
     <div
-      className="rounded-lg overflow-hidden group transition-all"
+      className="rounded-lg overflow-hidden group shadow-sm hover:shadow-md transition-shadow duration-200"
       style={{
         backgroundColor: bgColor,
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
         borderColor: borderColor,
         border: `1px solid ${borderColor}`,
       }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.boxShadow = "0 10px 15px rgba(0, 0, 0, 0.15)")
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)")
-      }
     >
       {/* Image Container */}
       <div
@@ -186,16 +179,10 @@ function ProductCardComponent({
               >
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-1 transition-colors"
+                  className="p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                   style={{
                     color: textColor,
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = `hsl(var(--theme-text) / 0.05)`)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
                   disabled={quantity === 1}
                 >
                   <Minus className="h-4 w-4" />
@@ -208,16 +195,10 @@ function ProductCardComponent({
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="p-1 transition-colors"
+                  className="p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                   style={{
                     color: textColor,
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = `hsl(var(--theme-text) / 0.05)`)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
                 >
                   <Plus className="h-4 w-4" />
                 </button>
