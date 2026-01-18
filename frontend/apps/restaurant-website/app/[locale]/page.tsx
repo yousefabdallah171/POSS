@@ -50,14 +50,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       'Order delicious food online from our restaurant.';
     const logoUrl = theme.identity?.logoUrl || theme.logo_url || '';
 
+    const canonicalUrl = `https://${restaurantSlug}.example.com/${locale}`;
+
     return {
       title: `${siteTitle} - Order Food Online`,
       description: description,
+      alternates: {
+        // Hreflang for language alternates
+        languages: {
+          'en': `https://${restaurantSlug}.example.com/en`,
+          'ar': `https://${restaurantSlug}.example.com/ar`,
+        },
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title: siteTitle,
         description: description,
         type: 'website',
-        url: `https://${restaurantSlug}.example.com/${locale}`,
+        url: canonicalUrl,
         siteName: siteTitle,
         images: logoUrl
           ? [
@@ -79,6 +89,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       keywords: [siteTitle, 'restaurant', 'food delivery', 'order online'],
       authors: [{ name: siteTitle }],
       creator: siteTitle,
+      // Additional metadata for search engines
+      applicationName: siteTitle,
+      generator: 'Next.js',
     };
   } catch (error) {
     console.error('Failed to generate metadata:', error);
