@@ -1,0 +1,244 @@
+"use client";
+
+import Link from "next/link";
+import { memo } from "react";
+import { Facebook, Instagram, Twitter, Phone, Mail, MapPin } from "lucide-react";
+import { useThemeFooter, useThemeIdentity } from "@/lib/hooks/use-theme";
+
+interface FooterProps {
+  locale?: "en" | "ar";
+  restaurantName?: string;
+}
+
+/**
+ * Footer component with contact info and links
+ */
+function FooterComponent({ locale = "en", restaurantName: defaultName = "Restaurant" }: FooterProps) {
+  const isRTL = locale === "ar";
+  const themeFooter = useThemeFooter();
+  const themeIdentity = useThemeIdentity();
+
+  // Use theme data or fallback
+  const footerBgColor = themeFooter?.background_color || "#111827";
+  const footerTextColor = themeFooter?.text_color || "#f3f4f6";
+  const restaurantName = themeIdentity?.site_title || defaultName;
+  const companyDescription = themeFooter?.company_description || (
+    locale === "en"
+      ? "Delivering delicious food right to your doorstep with quality and care."
+      : "توصيل الطعام اللذيذ إلى باب منزلك بجودة واهتمام."
+  );
+  // Use theme data, NOT hardcoded fallbacks (prevents fake contact info)
+  const address = themeFooter?.address || "";
+  const phone = themeFooter?.phone || "";
+  const email = themeFooter?.email || "";
+  const copyrightText = themeFooter?.copyright_text || (locale === "en" ? `© ${new Date().getFullYear()} ${restaurantName}. All rights reserved.` : `© ${new Date().getFullYear()} ${restaurantName}. جميع الحقوق محفوظة.`);
+
+  const sections = {
+    en: {
+      about: "About Us",
+      menu: "Menu",
+      orders: "Orders",
+      contact: "Contact",
+      followUs: "Follow Us",
+      company: "Company",
+      legal: "Legal",
+      hours: "Opening Hours",
+      address: "Address",
+      phone: "Phone",
+      email: "Email",
+      copyright: "© 2024 {name}. All rights reserved.",
+      links: {
+        about: "About",
+        faq: "FAQ",
+        blog: "Blog",
+        careers: "Careers",
+      },
+      legal_links: {
+        terms: "Terms of Service",
+        privacy: "Privacy Policy",
+        cookies: "Cookie Policy",
+      },
+    },
+    ar: {
+      about: "معلومات عنا",
+      menu: "القائمة",
+      orders: "الطلبات",
+      contact: "الاتصال",
+      followUs: "تابعنا",
+      company: "الشركة",
+      legal: "القانوني",
+      hours: "ساعات العمل",
+      address: "العنوان",
+      phone: "الهاتف",
+      email: "البريد الإلكتروني",
+      copyright: "© 2024 {name}. جميع الحقوق محفوظة.",
+      links: {
+        about: "عن الشركة",
+        faq: "الأسئلة الشائعة",
+        blog: "المدونة",
+        careers: "الوظائف",
+      },
+      legal_links: {
+        terms: "شروط الخدمة",
+        privacy: "سياسة الخصوصية",
+        cookies: "سياسة ملفات تعريف الارتباط",
+      },
+    },
+  };
+
+  const t = sections[locale as keyof typeof sections] || sections.en;
+
+  return (
+    <footer
+      className="pt-16 pb-8"
+      style={{
+        backgroundColor: footerBgColor,
+        color: footerTextColor,
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Footer Grid */}
+        <div className={`grid grid-cols-1 md:grid-cols-4 gap-8 mb-12 ${isRTL ? "text-right" : "text-left"}`}>
+          {/* About Section */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: footerTextColor }}>
+              {restaurantName}
+            </h3>
+            <p className="text-sm mb-4" style={{ color: footerTextColor, opacity: 0.8 }}>
+              {companyDescription}
+            </p>
+            <div className="flex gap-4 justify-start">
+              {themeFooter?.social_links?.facebook && (
+                <Link
+                  href={themeFooter.social_links.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80"
+                  style={{ color: footerTextColor, opacity: 0.8 }}
+                >
+                  <Facebook className="h-5 w-5" />
+                </Link>
+              )}
+              {themeFooter?.social_links?.instagram && (
+                <Link
+                  href={themeFooter.social_links.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80"
+                  style={{ color: footerTextColor, opacity: 0.8 }}
+                >
+                  <Instagram className="h-5 w-5" />
+                </Link>
+              )}
+              {themeFooter?.social_links?.twitter && (
+                <Link
+                  href={themeFooter.social_links.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80"
+                  style={{ color: footerTextColor, opacity: 0.8 }}
+                >
+                  <Twitter className="h-5 w-5" />
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4" style={{ color: footerTextColor }}>
+              {t.company}
+            </h4>
+            <ul className="space-y-2">
+              {Object.entries(t.links).map(([key, label]) => (
+                <li key={key}>
+                  <Link
+                    href="#"
+                    className="text-sm transition-opacity hover:opacity-100"
+                    style={{ color: footerTextColor, opacity: 0.8 }}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4" style={{ color: footerTextColor }}>
+              {t.legal}
+            </h4>
+            <ul className="space-y-2">
+              {Object.entries(t.legal_links).map(([key, label]) => (
+                <li key={key}>
+                  <Link
+                    href="#"
+                    className="text-sm transition-opacity hover:opacity-100"
+                    style={{ color: footerTextColor, opacity: 0.8 }}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4" style={{ color: footerTextColor }}>
+              {t.contact}
+            </h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2">
+                <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <span className="text-sm" style={{ color: footerTextColor, opacity: 0.8 }}>
+                  {address}
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Phone className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <a
+                  href={`tel:${phone.replace(/\D/g, '')}`}
+                  className="text-sm transition-opacity hover:opacity-80"
+                  style={{ color: footerTextColor, opacity: 0.8 }}
+                >
+                  {phone}
+                </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <Mail className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <a
+                  href={`mailto:${email}`}
+                  className="text-sm transition-opacity hover:opacity-80"
+                  style={{ color: footerTextColor, opacity: 0.8 }}
+                >
+                  {email}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div
+          className="mb-8"
+          style={{
+            borderTop: `1px solid ${footerTextColor}`,
+            opacity: 0.3,
+          }}
+        ></div>
+
+        {/* Copyright */}
+        <div
+          className={`text-center text-sm ${isRTL ? "text-right" : "text-left"}`}
+          style={{ color: footerTextColor, opacity: 0.7 }}
+        >
+          <p>{copyrightText}</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export const Footer = memo(FooterComponent);
