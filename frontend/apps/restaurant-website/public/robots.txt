@@ -1,0 +1,25 @@
+# Restaurant Website Robots.txt
+# Allow all crawlers to index the site
+
+User-agent: *
+Allow: /
+Allow: /en/
+Allow: /ar/
+Allow: /sitemap.xml
+Allow: /robots.txt
+
+# Disallow private pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /orders/
+
+# Crawl delay (ms) - be respectful of server resources
+# Not all crawlers support this, but it's good practice
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://example.com/sitemap.xml
+
+# Comment: Update example.com to your actual domain
+# This file ensures search engines can crawl your site efficiently
