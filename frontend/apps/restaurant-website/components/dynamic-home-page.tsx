@@ -384,12 +384,14 @@ export function DynamicHomePage({ restaurantSlug, locale }: DynamicHomePageProps
 
   return (
     <div className="bg-white dark:bg-gray-900" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Theme-based Header with unique styling per theme */}
-      <Header
-        config={theme.header}
-        isArabic={isRTL}
-        theme={theme}
-      />
+      {/* Header with error boundary to prevent page breaking on header errors */}
+      <ErrorBoundary section="header" locale={locale}>
+        <Header
+          config={theme.header}
+          isArabic={isRTL}
+          theme={theme}
+        />
+      </ErrorBoundary>
 
       {/* Main Content */}
       <main className="bg-white dark:bg-gray-900">
@@ -431,11 +433,13 @@ export function DynamicHomePage({ restaurantSlug, locale }: DynamicHomePageProps
         )}
       </main>
 
-      {/* Theme-based Footer with unique styling per theme */}
-      <Footer
-        config={theme.footer}
-        isArabic={isRTL}
-      />
+      {/* Footer with error boundary to prevent page breaking on footer errors */}
+      <ErrorBoundary section="footer" locale={locale}>
+        <Footer
+          config={theme.footer}
+          isArabic={isRTL}
+        />
+      </ErrorBoundary>
     </div>
   );
 }
