@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ProductCard } from './product-card';
 import { useCartStore } from '@/lib/store/cart-store';
+import { useProducts } from '@/lib/hooks/use-api-queries';
 import { AlertCircle, Loader } from 'lucide-react';
 
 interface Product {
@@ -36,65 +37,19 @@ export function FeaturedProductsSection({
   locale = 'en',
   limit = 6,
 }: FeaturedProductsSectionProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const addToCart = useCartStore((state) => state.addItem);
   const isRTL = locale === 'ar';
 
-  // Fetch products from API
-  useEffect(() => {
-    if (!restaurantSlug) {
-      setError('Restaurant slug is required');
-      setIsLoading(false);
-      return;
-    }
+  // Use React Query for data fetching with built-in caching
+  const { data: allProducts = [], isLoading, error } = useProducts(restaurantSlug);
 
-    const fetchProducts = async () => {
-      const controller = new AbortController();
-      let timeoutId: NodeJS.Timeout | undefined;
+  // Limit featured products and memoize
+  const products = useMemo(() => {
+    return Array.isArray(allProducts) ? allProducts.slice(0, limit) : [];
+  }, [allProducts, limit]);
 
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-        const productsUrl = `${apiUrl}/public/restaurants/${restaurantSlug}/products?lang=${locale}&limit=${limit}`;
-
-        // Timeout after 5 seconds
-        timeoutId = setTimeout(() => controller.abort(), 5000);
-
-        const response = await fetch(productsUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          signal: controller.signal,
-        });
-
-        if (timeoutId) clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products (${response.status})`);
-        }
-
-        const data = await response.json();
-        const productsData = data.data?.products || data.products || [];
-
-        setProducts(Array.isArray(productsData) ? productsData.slice(0, limit) : []);
-      } catch (err) {
-        setError('Failed to load products. Please try again later.');
-        setProducts([]);
-      } finally {
-        if (timeoutId) clearTimeout(timeoutId);
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [restaurantSlug, locale, limit]);
-
-  const handleAddToCart = (product: Product, quantity: number) => {
+  // Memoize handleAddToCart to preserve reference
+  const handleAddToCart = useCallback((product: Product, quantity: number) => {
     // Add to cart store
     for (let i = 0; i < quantity; i++) {
       addToCart({
@@ -104,7 +59,7 @@ export function FeaturedProductsSection({
         image: product.image || product.main_image_url || '',
       });
     }
-  };
+  }, [addToCart]);
 
   // Loading state
   if (isLoading) {
@@ -121,12 +76,13 @@ export function FeaturedProductsSection({
 
   // Error state
   if (error && products.length === 0) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to load products. Please try again later.';
     return (
       <section className="w-full py-16 px-4 bg-gray-50 dark:bg-gray-800/50">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
             <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-            <p className="text-sm text-yellow-800 dark:text-yellow-300">{error}</p>
+            <p className="text-sm text-yellow-800 dark:text-yellow-300">{errorMessage}</p>
           </div>
         </div>
       </section>
