@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SubdomainProvider } from "@/lib/subdomain-context";
+import { WebVitalsProvider } from "@/components/providers/web-vitals-provider";
 import "../styles/globals.css";
 import "../styles/theme-variables.css";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <WebVitalsProvider />
         <SubdomainProvider>
           <ThemeProvider>
             <QueryProvider>{children}</QueryProvider>
