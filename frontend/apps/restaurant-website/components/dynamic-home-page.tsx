@@ -133,9 +133,9 @@ export function DynamicHomePage({ restaurantSlug, locale }: DynamicHomePageProps
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
         const homepageUrl = `${apiUrl}/public/restaurants/${restaurantSlug}/homepage`;
 
-        // Create an AbortController with 10 second timeout
+        // Create an AbortController with 5 second timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
         const response = await fetch(homepageUrl, {
           method: 'GET',
