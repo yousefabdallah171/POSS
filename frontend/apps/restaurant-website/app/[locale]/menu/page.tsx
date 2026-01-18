@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { LayoutWrapper } from '@/components/layout-wrapper';
 import { ProductCard } from '@/components/product-card';
@@ -41,18 +41,18 @@ export default function MenuPage() {
   const { data: allProductsResponse, isLoading: productsLoading } = useProducts(restaurantSlug);
   const { data: searchResults, isLoading: searchLoading } = useSearchProducts(searchQuery, restaurantSlug);
 
-  // Map API response to component format
-  const mapProductFromAPI = (apiProduct: any) => ({
+  // Map API response to component format - memoized to preserve reference
+  const mapProductFromAPI = useCallback((apiProduct: any) => ({
     ...apiProduct,
     name: apiProduct.name_en || apiProduct.name || '',
     description: apiProduct.description_en || apiProduct.description || '',
     image: apiProduct.main_image_url || apiProduct.image || '',
     category: apiProduct.category_name || apiProduct.category || '',
-  });
+  }), []);
 
   const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
-  const allProducts = useMemo(() => (allProductsResponse || []).map(mapProductFromAPI), [allProductsResponse]);
-  const searchResultsMapped = useMemo(() => (searchResults || []).map(mapProductFromAPI), [searchResults]);
+  const allProducts = useMemo(() => (allProductsResponse || []).map(mapProductFromAPI), [allProductsResponse, mapProductFromAPI]);
+  const searchResultsMapped = useMemo(() => (searchResults || []).map(mapProductFromAPI), [searchResults, mapProductFromAPI]);
   const isLoading = categoriesLoading || productsLoading;
 
   // Memoize filtered products to prevent recalculation on every render
@@ -66,7 +66,8 @@ export default function MenuPage() {
     return products;
   }, [searchQuery, searchResultsMapped, allProducts, selectedCategory]);
 
-  const handleAddToCart = (product: any, quantity: number) => {
+  // Memoize handleAddToCart to preserve reference for ProductCard component
+  const handleAddToCart = useCallback((product: any, quantity: number) => {
     for (let i = 0; i < quantity; i++) {
       addToCart({
         id: product.id,
@@ -75,7 +76,7 @@ export default function MenuPage() {
         image: product.image || product.main_image_url || '',
       });
     }
-  };
+  }, [addToCart]);
 
   // Show loading while we're waiting for the slug to be extracted
   if (!restaurantSlug) {
