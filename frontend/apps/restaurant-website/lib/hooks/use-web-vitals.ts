@@ -1,14 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import {
-  getCLS,
-  getFID,
-  getFCP,
-  getLCP,
-  getTTFB,
-  Metric,
-} from 'web-vitals';
+import type { Metric } from 'web-vitals';
 
 /**
  * Hook to capture Core Web Vitals and send to monitoring endpoint
@@ -53,33 +46,20 @@ export function useWebVitals() {
       }
     };
 
-    // Subscribe to all Core Web Vitals
-    getCLS(handleMetric);
-    getFID(handleMetric);
-    getFCP(handleMetric);
-    getLCP(handleMetric);
-    getTTFB(handleMetric);
-  }, []);
-}
-
-/**
- * Alternative: Hook to log metrics to console only (for development)
- */
-export function useWebVitalsConsoleLogger() {
-  useEffect(() => {
-    const handleMetric = (metric: Metric) => {
-      console.log('[Web Vital]', {
-        name: metric.name,
-        value: `${metric.value.toFixed(2)}ms`,
-        rating: metric.rating,
-      });
-    };
-
-    getCLS(handleMetric);
-    getFID(handleMetric);
-    getFCP(handleMetric);
-    getLCP(handleMetric);
-    getTTFB(handleMetric);
+    // Dynamically import web-vitals at runtime
+    // web-vitals v5 exports onCLS, onFID, onFCP, onLCP, onTTFB
+    import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+      // Subscribe to all Core Web Vitals
+      onCLS(handleMetric);
+      onFID(handleMetric);
+      onFCP(handleMetric);
+      onLCP(handleMetric);
+      onTTFB(handleMetric);
+    }).catch((error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to load web-vitals:', error);
+      }
+    });
   }, []);
 }
 

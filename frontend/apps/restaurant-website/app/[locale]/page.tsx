@@ -14,7 +14,7 @@ interface PageProps {
  * Fetches restaurant theme data to create Open Graph tags for social sharing
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const headersList = headers();
+  const headersList = await headers();
   const restaurantSlug = headersList.get('x-restaurant-slug') || '';
   const locale = params.locale || 'en';
 
@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function HomePage({ params }: PageProps) {
-  const headersList = headers();
+  const headersList = await headers();
   const restaurantSlug = headersList.get('x-restaurant-slug') || '';
   const locale = params.locale || 'en';
 
