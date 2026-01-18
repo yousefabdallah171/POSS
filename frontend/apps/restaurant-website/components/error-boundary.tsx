@@ -128,16 +128,10 @@ export class ErrorBoundary extends Component<Props, State> {
             )}
             <button
               onClick={this.handleRetry}
-              className="mt-3 inline-flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-colors"
+              className="mt-3 inline-flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-colors hover:opacity-90"
               style={{
                 backgroundColor: "#dc2626",
                 color: "#ffffff",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b91c1c";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#dc2626";
               }}
             >
               <RefreshCw className="h-3 w-3" />
