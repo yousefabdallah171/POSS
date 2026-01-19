@@ -41,10 +41,13 @@ export function MenuPageContent({ locale, themeData, restaurantSlug }: MenuPageC
   // Map API response to component format - memoized to preserve reference
   const mapProductFromAPI = useCallback((apiProduct: any) => ({
     ...apiProduct,
+    id: apiProduct.id,
     name: apiProduct.name_en || apiProduct.name || '',
     description: apiProduct.description_en || apiProduct.description || '',
+    price: apiProduct.price || 0,
     image: apiProduct.main_image_url || apiProduct.image || '',
-    category: apiProduct.category_name || apiProduct.category || '',
+    categoryId: apiProduct.category_id,
+    isAvailable: apiProduct.is_available !== undefined ? apiProduct.is_available : true,
   }), []);
 
   const categories = useMemo(() => categoriesResponse || [], [categoriesResponse]);
