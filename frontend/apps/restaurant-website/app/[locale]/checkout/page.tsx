@@ -1,20 +1,20 @@
 import { HeaderSSR } from '@/components/header-ssr';
 import { FooterSSR } from '@/components/footer-ssr';
 import { getThemeDataServer, getDefaultThemeData } from '@/lib/api/get-theme-server';
-import { MenuPageContent } from './menu-page-content';
+import { CheckoutPageContent } from './checkout-page-content';
 
-interface MenuPageProps {
+interface CheckoutPageProps {
   params: Promise<{
     locale: 'en' | 'ar';
   }>;
 }
 
 export const metadata = {
-  title: 'Menu - Order Food Online',
-  description: 'Browse our delicious menu and add items to your cart',
+  title: 'Checkout - Complete Your Order',
+  description: 'Review your order and complete the checkout process',
 };
 
-export default async function MenuPage({ params }: MenuPageProps) {
+export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale || 'en';
 
@@ -31,7 +31,7 @@ export default async function MenuPage({ params }: MenuPageProps) {
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        <MenuPageContent locale={locale} themeData={themeData} />
+        <CheckoutPageContent locale={locale} themeData={themeData} />
       </main>
 
       {/* Footer */}

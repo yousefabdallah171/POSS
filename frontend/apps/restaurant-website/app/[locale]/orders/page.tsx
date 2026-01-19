@@ -1,20 +1,20 @@
 import { HeaderSSR } from '@/components/header-ssr';
 import { FooterSSR } from '@/components/footer-ssr';
 import { getThemeDataServer, getDefaultThemeData } from '@/lib/api/get-theme-server';
-import { MenuPageContent } from './menu-page-content';
+import { OrdersPageContent } from './orders-page-content';
 
-interface MenuPageProps {
+interface OrdersPageProps {
   params: Promise<{
     locale: 'en' | 'ar';
   }>;
 }
 
 export const metadata = {
-  title: 'Menu - Order Food Online',
-  description: 'Browse our delicious menu and add items to your cart',
+  title: 'My Orders - Track Your Orders',
+  description: 'View and track all your food orders',
 };
 
-export default async function MenuPage({ params }: MenuPageProps) {
+export default async function OrdersPage({ params }: OrdersPageProps) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale || 'en';
 
@@ -31,7 +31,7 @@ export default async function MenuPage({ params }: MenuPageProps) {
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        <MenuPageContent locale={locale} themeData={themeData} />
+        <OrdersPageContent locale={locale} themeData={themeData} />
       </main>
 
       {/* Footer */}
