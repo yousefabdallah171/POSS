@@ -21,6 +21,10 @@ export function OrdersPageContent({ locale, themeData }: OrdersPageContentProps)
   const isRTL = locale === 'ar';
   const t = createTranslator(locale);
 
+  // Extract theme colors with fallbacks
+  const primaryColor = themeData?.colors?.primary || '#f97316';
+  const secondaryColor = themeData?.colors?.secondary || '#0ea5e9';
+
   const { data: ordersResponse, isLoading, refetch, isFetching } = useOrders();
   const orders = (ordersResponse as any)?.data || ordersResponse || [];
 
@@ -30,7 +34,7 @@ export function OrdersPageContent({ locale, themeData }: OrdersPageContentProps)
       <div
         className="text-white py-12"
         style={{
-          background: `linear-gradient(135deg, ${themeData.colors.primary} 0%, ${themeData.colors.secondary} 100%)`,
+          background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
         }}
       >
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isRTL ? 'text-right' : ''}`}>
@@ -56,7 +60,7 @@ export function OrdersPageContent({ locale, themeData }: OrdersPageContentProps)
             <Button variant="outline">{t('orders.trackOrder')}</Button>
           </Link>
           <Link href={`/${locale}/menu`} className="ml-auto">
-            <Button style={{ backgroundColor: themeData.colors.primary }}>
+            <Button style={{ backgroundColor: primaryColor }}>
               {t('navigation.menu')}
             </Button>
           </Link>
@@ -65,7 +69,7 @@ export function OrdersPageContent({ locale, themeData }: OrdersPageContentProps)
         {/* Loading State */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader className="h-8 w-8 animate-spin mr-2" style={{ color: themeData.colors.primary }} />
+            <Loader className="h-8 w-8 animate-spin mr-2" style={{ color: primaryColor }} />
             <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
           </div>
         ) : Array.isArray(orders) && orders.length === 0 ? (
@@ -73,7 +77,7 @@ export function OrdersPageContent({ locale, themeData }: OrdersPageContentProps)
             <p className="text-gray-600 dark:text-gray-400 mb-4">{t('orders.noOrders')}</p>
             <p className="text-gray-500 dark:text-gray-400 mb-6">{t('orders.noOrdersDesc')}</p>
             <Link href={`/${locale}/menu`}>
-              <Button style={{ backgroundColor: themeData.colors.primary }}>
+              <Button style={{ backgroundColor: primaryColor }}>
                 {t('navigation.menu')}
               </Button>
             </Link>

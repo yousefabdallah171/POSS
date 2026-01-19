@@ -37,6 +37,10 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
   const isRTL = locale === 'ar';
   const t = createTranslator(locale);
 
+  // Extract theme colors with fallbacks
+  const primaryColor = themeData?.colors?.primary || '#f97316';
+  const secondaryColor = themeData?.colors?.secondary || '#0ea5e9';
+
   const cartItems = useCartStore((state) => state.items);
   const cartTotal = useCartStore((state) => state.getTotal());
   const clearCart = useCartStore((state) => state.clearCart);
@@ -64,7 +68,7 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
           <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-green-600 mb-2">{t('checkout.success')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{t('checkout.orderNumber')}:</p>
-          <p className="text-2xl font-bold mb-6" style={{ color: themeData.colors.primary }}>
+          <p className="text-2xl font-bold mb-6" style={{ color: primaryColor }}>
             {successOrderNumber}
           </p>
           <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -135,7 +139,7 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
       <div
         className="text-white py-12"
         style={{
-          background: `linear-gradient(135deg, ${themeData.colors.primary} 0%, ${themeData.colors.secondary} 100%)`,
+          background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
         }}
       >
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isRTL ? 'text-right' : ''}`}>
@@ -265,7 +269,7 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
                             borderColor:
                               // @ts-ignore
                               register('paymentMethod').name === method.value
-                                ? themeData.colors.primary
+                                ? primaryColor
                                 : undefined,
                           }}
                         >
@@ -281,7 +285,7 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
                   type="submit"
                   disabled={isLoading}
                   className="w-full py-3 text-lg"
-                  style={{ backgroundColor: themeData.colors.primary }}
+                  style={{ backgroundColor: primaryColor }}
                 >
                   {isLoading ? (
                     <>
@@ -334,14 +338,14 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
 
                 <div className={`flex justify-between text-lg border-t border-gray-200 dark:border-gray-700 pt-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <span className="font-bold">{t('common.grandTotal')}</span>
-                  <span className="text-2xl font-bold" style={{ color: themeData.colors.primary }}>
+                  <span className="text-2xl font-bold" style={{ color: primaryColor }}>
                     ${grandTotal.toFixed(2)}
                   </span>
                 </div>
               </div>
 
               {/* Back to Cart Link */}
-              <Link href={`/${locale}/cart`} className="text-primary hover:underline text-sm mt-4 block" style={{ color: themeData.colors.primary }}>
+              <Link href={`/${locale}/cart`} className="text-primary hover:underline text-sm mt-4 block" style={{ color: primaryColor }}>
                 {t('cart.continueShopping')}
               </Link>
             </div>

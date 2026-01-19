@@ -34,6 +34,10 @@ export function SettingsPageContent({ locale, themeData }: SettingsPageContentPr
   const isRTL = locale === 'ar';
   const t = createTranslator(locale);
 
+  // Extract theme colors with fallbacks
+  const themePrimaryColor = themeData?.colors?.primary || '#f97316';
+  const themeSecondaryColor = themeData?.colors?.secondary || '#0ea5e9';
+
   const { settings, setSettings, updateLanguage, updateTheme, updateColors } = usePreferencesStore();
   const [saved, setSaved] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor);
@@ -75,7 +79,7 @@ export function SettingsPageContent({ locale, themeData }: SettingsPageContentPr
       <div
         className="text-white py-12"
         style={{
-          background: `linear-gradient(135deg, ${themeData.colors.primary} 0%, ${themeData.colors.secondary} 100%)`,
+          background: `linear-gradient(135deg, ${themePrimaryColor} 0%, ${themeSecondaryColor} 100%)`,
         }}
       >
         <div className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ${isRTL ? 'text-right' : ''}`}>
@@ -113,12 +117,12 @@ export function SettingsPageContent({ locale, themeData }: SettingsPageContentPr
                       : 'border-gray-300 dark:border-gray-600 hover:border-primary'
                   }`}
                   style={{
-                    borderColor: locale === loc ? themeData.colors.primary : undefined,
+                    borderColor: locale === loc ? themePrimaryColor : undefined,
                   }}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">{loc === 'en' ? 'English' : 'العربية'}</span>
-                    {locale === loc && <Check className="h-5 w-5" style={{ color: themeData.colors.primary }} />}
+                    {locale === loc && <Check className="h-5 w-5" style={{ color: themePrimaryColor }} />}
                   </div>
                 </button>
               ))}
@@ -141,12 +145,12 @@ export function SettingsPageContent({ locale, themeData }: SettingsPageContentPr
                       : 'border-gray-300 dark:border-gray-600 hover:border-primary'
                   }`}
                   style={{
-                    borderColor: settings.theme === value ? themeData.colors.primary : undefined,
+                    borderColor: settings.theme === value ? themePrimaryColor : undefined,
                   }}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">{label}</span>
-                    {settings.theme === value && <Check className="h-5 w-5" style={{ color: themeData.colors.primary }} />}
+                    {settings.theme === value && <Check className="h-5 w-5" style={{ color: themePrimaryColor }} />}
                   </div>
                 </button>
               ))}
@@ -256,7 +260,7 @@ export function SettingsPageContent({ locale, themeData }: SettingsPageContentPr
               <Button
                 onClick={handleCustomColors}
                 className="w-full sm:w-auto"
-                style={{ backgroundColor: themeData.colors.primary }}
+                style={{ backgroundColor: themePrimaryColor }}
               >
                 {t('settings.save')}
               </Button>

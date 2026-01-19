@@ -17,6 +17,10 @@ export function CartPageContent({ locale, themeData }: CartPageContentProps) {
   const isRTL = locale === 'ar';
   const t = createTranslator(locale);
 
+  // Extract theme colors with fallbacks
+  const primaryColor = themeData?.colors?.primary || '#f97316';
+  const secondaryColor = themeData?.colors?.secondary || '#0ea5e9';
+
   const cartItems = useCartStore((state) => state.items);
   const cartTotal = useCartStore((state) => state.getTotalItems());
 
@@ -45,7 +49,7 @@ export function CartPageContent({ locale, themeData }: CartPageContentProps) {
       <div
         className="text-white py-12"
         style={{
-          background: `linear-gradient(135deg, ${themeData.colors.primary} 0%, ${themeData.colors.secondary} 100%)`,
+          background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
         }}
       >
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isRTL ? 'text-right' : ''}`}>

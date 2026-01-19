@@ -24,6 +24,10 @@ export function MenuPageContent({ locale, themeData, restaurantSlug }: MenuPageC
   const isRTL = locale === 'ar';
   const t = createTranslator(locale);
 
+  // Extract theme colors with fallbacks
+  const primaryColor = themeData?.colors?.primary || '#f97316';
+  const secondaryColor = themeData?.colors?.secondary || '#0ea5e9';
+
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const addToCart = useCartStore((state) => state.addItem);
@@ -89,7 +93,7 @@ export function MenuPageContent({ locale, themeData, restaurantSlug }: MenuPageC
       <div
         className="text-white py-12"
         style={{
-          background: `linear-gradient(135deg, ${themeData.colors.primary} 0%, ${themeData.colors.secondary} 100%)`,
+          background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
         }}
       >
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isRTL ? 'text-right' : ''}`}>
@@ -166,7 +170,7 @@ export function MenuPageContent({ locale, themeData, restaurantSlug }: MenuPageC
             {/* Checkout CTA */}
             {cartItems > 0 && (
               <div className={`mt-12 text-white p-6 rounded-lg flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}
-                style={{ backgroundColor: themeData.colors.primary }}
+                style={{ backgroundColor: primaryColor }}
               >
                 <div>
                   <p className="text-lg font-semibold">
