@@ -7,7 +7,7 @@ const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@pos-saas/ui', '@pos-saas/types'],
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'images.unsplash.com'],
     // Enable AVIF for better compression (25-30% smaller than WebP)
     formats: ['image/avif', 'image/webp'],
     // Image optimization settings
