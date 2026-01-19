@@ -1,0 +1,244 @@
+/**
+ * Theme Transitions CSS
+ * Smooth animations for theme switching
+ */
+
+/**
+ * Root transitions for smooth color changes
+ * Applied to html element for global effect
+ */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/**
+ * Universal element transitions
+ * Applies smooth transitions to all elements
+ */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease,
+              border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/**
+ * Disable transitions for reduced motion preference
+ */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  * {
+    transition: none !important;
+  }
+}
+
+/**
+ * Theme-specific transition classes
+ */
+
+.theme-transition-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.theme-transition-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.theme-transition-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.theme-transition-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/**
+ * Color animation for theme changing
+ */
+@keyframes colorShift {
+  from {
+    opacity: 0.95;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.theme-color-shift {
+  animation: colorShift 0.3s ease-out;
+}
+
+/**
+ * Fast transitions for interactive elements
+ */
+button,
+a,
+input,
+textarea,
+select {
+  transition: background-color 0.2s ease, color 0.2s ease,
+              border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/**
+ * Slower transitions for larger content areas
+ */
+.card,
+[class*="panel"],
+[class*="container"] {
+  transition: background-color 0.4s ease, color 0.4s ease,
+              border-color 0.4s ease;
+}
+
+/**
+ * No transition for certain elements to prevent jank
+ */
+img,
+svg,
+video {
+  transition: none;
+}
+
+/**
+ * Focus state transitions
+ */
+:focus-visible {
+  transition: outline 0.2s ease, outline-offset 0.2s ease;
+}
+
+/**
+ * Hover state transitions
+ */
+:hover {
+  transition: background-color 0.2s ease, color 0.2s ease,
+              transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/**
+ * Active state transitions
+ */
+:active {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+/**
+ * Gradient transitions
+ */
+[style*="gradient"] {
+  transition: background 0.3s ease;
+}
+
+/**
+ * Shadow transitions
+ */
+[class*="shadow"] {
+  transition: box-shadow 0.3s ease;
+}
+
+/**
+ * Opacity transitions for fade effects
+ */
+[style*="opacity"] {
+  transition: opacity 0.3s ease;
+}
+
+/**
+ * Transform transitions for scale/rotate effects
+ */
+[style*="transform"] {
+  transition: transform 0.3s ease;
+}
+
+/**
+ * Smooth scrolling
+ */
+html {
+  scroll-behavior: smooth;
+}
+
+/**
+ * Page transition animations
+ */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.page-enter {
+  animation: pageEnter 0.3s ease-out;
+}
+
+.page-exit {
+  animation: pageExit 0.3s ease-out;
+}
+
+/**
+ * Theme switcher loading animation
+ */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/**
+ * Pulse animation for emphasis
+ */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/**
+ * Bounce animation for attention
+ */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-25%);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}

@@ -41,7 +41,7 @@ function ProductCardComponent({
 }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
-  const themeColors = useThemeColors();
+  const themeColors = useThemeColors() as any;
 
   useEffect(() => {
     if (isAdded) {

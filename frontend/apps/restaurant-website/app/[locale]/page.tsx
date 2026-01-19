@@ -1,12 +1,15 @@
 import { headers } from 'next/headers';
 import { DynamicHomePage } from '@/components/dynamic-home-page';
+import { HeaderSSR } from '@/components/header-ssr';
+import { FooterSSR } from '@/components/footer-ssr';
+import { getThemeDataServer, getDefaultThemeData } from '@/lib/api/get-theme-server';
 import { AlertCircle } from 'lucide-react';
 import type { Metadata } from 'next';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     locale: 'en' | 'ar';
-  };
+  }>;
 }
 
 /**
@@ -14,9 +17,10 @@ interface PageProps {
  * Fetches restaurant theme data to create Open Graph tags for social sharing
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const resolvedParams = await params;
   const headersList = await headers();
   const restaurantSlug = headersList.get('x-restaurant-slug') || '';
-  const locale = params.locale || 'en';
+  const locale = resolvedParams.locale || 'en';
 
   if (!restaurantSlug) {
     return {
@@ -103,9 +107,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function HomePage({ params }: PageProps) {
+  const resolvedParams = await params;
   const headersList = await headers();
   const restaurantSlug = headersList.get('x-restaurant-slug') || '';
-  const locale = params.locale || 'en';
+  const locale = resolvedParams.locale || 'en';
 
   // Validate restaurant slug
   if (!restaurantSlug) {
@@ -176,15 +181,35 @@ export default async function HomePage({ params }: PageProps) {
       productsResponse.json(),
     ]);
 
-    // HTML is generated with data already inside ✅
+    // Extract theme from nested response structure
+    const themeDataExtracted = themeData.data?.data?.config || themeData.data?.config || themeData;
+
     return (
-      <DynamicHomePage
-        initialHomepageData={homepageData}
-        initialThemeData={themeData}
-        initialProductsData={productsData}
-        restaurantSlug={restaurantSlug}
-        locale={locale}
-      />
+      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        {/* Unified Header */}
+        <HeaderSSR
+          themeData={themeDataExtracted}
+          locale={locale}
+          cartItemsCount={0}
+        />
+
+        {/* Main Content */}
+        <main className="flex-1 w-full">
+          <DynamicHomePage
+            initialHomepageData={homepageData}
+            initialThemeData={themeData}
+            initialProductsData={productsData}
+            restaurantSlug={restaurantSlug}
+            locale={locale}
+          />
+        </main>
+
+        {/* Unified Footer */}
+        <FooterSSR
+          themeData={themeDataExtracted}
+          locale={locale}
+        />
+      </div>
     );
   } catch (error) {
     console.error('Failed to load restaurant data:', error);

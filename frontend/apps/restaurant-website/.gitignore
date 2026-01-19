@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+.pnpm-debug.log
+.pnpm-store
+
+# Production
+build
+dist
+out
+
+# Next.js
+.next
+.vercel
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage

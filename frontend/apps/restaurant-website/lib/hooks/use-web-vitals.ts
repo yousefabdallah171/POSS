@@ -47,14 +47,15 @@ export function useWebVitals() {
     };
 
     // Dynamically import web-vitals at runtime
-    // web-vitals v5 exports onCLS, onFID, onFCP, onLCP, onTTFB
-    import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+    // web-vitals v5 exports onCLS, onINP (replaces onFID), onFCP, onLCP, onTTFB
+    import('web-vitals').then((vitals: any) => {
       // Subscribe to all Core Web Vitals
-      onCLS(handleMetric);
-      onFID(handleMetric);
-      onFCP(handleMetric);
-      onLCP(handleMetric);
-      onTTFB(handleMetric);
+      vitals.onCLS?.(handleMetric);
+      vitals.onINP?.(handleMetric); // INP replaces FID in v5
+      vitals.onFID?.(handleMetric); // Fallback for older versions
+      vitals.onFCP?.(handleMetric);
+      vitals.onLCP?.(handleMetric);
+      vitals.onTTFB?.(handleMetric);
     }).catch((error) => {
       if (process.env.NODE_ENV === 'development') {
         console.warn('Failed to load web-vitals:', error);

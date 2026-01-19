@@ -1,0 +1,313 @@
+/**
+ * Focus Indicators CSS
+ * WCAG AA compliant focus visible styles for keyboard navigation
+ * Ensures all interactive elements have clear focus indicators
+ */
+
+/**
+ * Remove default outline and add custom focus styles
+ * Applies to all interactive elements
+ */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/**
+ * Button focus styles
+ */
+button:focus-visible,
+input[type="button"]:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="reset"]:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--theme-primary, #f97316),
+    0 0 0 10px rgba(249, 115, 22, 0.1);
+}
+
+/**
+ * Link focus styles
+ */
+a:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+/**
+ * Input focus styles
+ */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+  box-shadow: inset 0 0 0 3px var(--theme-background, #ffffff),
+    0 0 0 5px var(--theme-primary, #f97316),
+    0 0 0 10px rgba(249, 115, 22, 0.1);
+}
+
+/**
+ * Checkbox and radio button focus styles
+ */
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+}
+
+/**
+ * Skip link styling
+ * Make skip links visible on focus
+ */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--theme-primary, #f97316);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
+  font-weight: bold;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0;
+  outline: 3px solid white;
+  outline-offset: 2px;
+}
+
+/**
+ * Screen reader only class
+ * Hides content visually but keeps it available to screen readers
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/**
+ * Show sr-only content on focus
+ */
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/**
+ * Visible focus indicator for keyboard navigation
+ * Only show when navigation is with keyboard
+ */
+.keyboard-focus:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+}
+
+/**
+ * High contrast focus styles for accessibility
+ */
+@media (prefers-contrast: more) {
+  :focus-visible {
+    outline: 4px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  button:focus-visible,
+  input[type="button"]:focus-visible,
+  input[type="submit"]:focus-visible,
+  input[type="reset"]:focus-visible {
+    outline: 4px solid var(--theme-primary, #f97316);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px var(--theme-primary, #f97316),
+      0 0 0 12px rgba(249, 115, 22, 0.2);
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 4px solid var(--theme-primary, #f97316);
+    outline-offset: 3px;
+  }
+}
+
+/**
+ * Reduced motion: simplify focus animation
+ */
+@media (prefers-reduced-motion: reduce) {
+  :focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+    transition: none;
+  }
+
+  button:focus-visible {
+    animation: none;
+  }
+}
+
+/**
+ * Dark mode adjustments
+ * Ensure focus indicators are visible in dark mode
+ */
+@media (prefers-color-scheme: dark) {
+  :focus-visible {
+    outline-color: var(--theme-primary, #f97316);
+  }
+
+  button:focus-visible,
+  input[type="button"]:focus-visible,
+  input[type="submit"]:focus-visible,
+  input[type="reset"]:focus-visible {
+    outline-color: var(--theme-primary, #f97316);
+  }
+
+  a:focus-visible {
+    outline-color: var(--theme-primary, #f97316);
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline-color: var(--theme-primary, #f97316);
+    box-shadow: inset 0 0 0 3px var(--theme-background, #1f2937),
+      0 0 0 5px var(--theme-primary, #f97316),
+      0 0 0 10px rgba(249, 115, 22, 0.2);
+  }
+}
+
+/**
+ * Custom focus ring utility class
+ */
+.focus-ring {
+  position: relative;
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+}
+
+.focus-ring:focus-visible::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  bottom: -6px;
+  left: -6px;
+  border: 3px solid var(--theme-primary, #f97316);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/**
+ * Focus styles for complex interactive components
+ */
+.interactive-group:focus-within {
+  box-shadow: inset 0 0 0 3px var(--theme-primary, #f97316),
+    0 0 0 2px var(--theme-background, #ffffff);
+}
+
+/**
+ * Visible focus indicator state class
+ * Used to show focus indicators only when navigating with keyboard
+ */
+.show-focus-indicator:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(249, 115, 22, 0.1);
+}
+
+/**
+ * Ensure focus visible works in older browsers
+ */
+.js-focus-visible :focus:not([data-focus-visible-added]) {
+  outline: none;
+}
+
+.js-focus-visible [data-focus-visible-added]:focus {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+}
+
+/**
+ * Tab focus indicator
+ */
+*:not(:focus-visible) {
+  outline: none;
+}
+
+/**
+ * Modal and overlay focus trap
+ */
+[role="dialog"]:focus-visible,
+[role="alertdialog"]:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 4px;
+}
+
+/**
+ * Navigation focus styles
+ */
+nav a:focus-visible,
+[role="navigation"] a:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 4px;
+  text-decoration: underline;
+}
+
+/**
+ * Tab list focus styles
+ */
+[role="tablist"] [role="tab"]:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: -3px;
+}
+
+/**
+ * Menu and menuitem focus styles
+ */
+[role="menu"] [role="menuitem"]:focus-visible,
+[role="menubar"] [role="menuitem"]:focus-visible {
+  background-color: rgba(249, 115, 22, 0.1);
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: -2px;
+}
+
+/**
+ * Listbox and option focus styles
+ */
+[role="listbox"] [role="option"]:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: -3px;
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+/**
+ * Combobox focus styles
+ */
+[role="combobox"]:focus-visible {
+  outline: 3px solid var(--theme-primary, #f97316);
+  outline-offset: 2px;
+}

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Loader, AlertCircle } from 'lucide-react';
-import { SectionRenderer, Header, Footer } from '@pos-saas/ui-themes';
+import { SectionRenderer } from '@pos-saas/ui-themes';
 import { FeaturedProductsSection } from './featured-products-section';
 import { ErrorBoundary } from './error-boundary';
 
@@ -41,14 +41,23 @@ interface HeaderConfig {
 
 interface FooterConfig {
   companyName: string;
+  companyDescription?: string;
   address?: string;
   phone?: string;
   email?: string;
   copyrightText: string;
-  socialLinks: Array<{ platform: string; url: string }>;
+  socialLinks: Array<{ id?: string | number; platform: string; url: string }>;
+  legalLinks?: Array<{ label: string; href: string }>;
   backgroundColor: string;
   textColor: string;
+  linkColor?: string;
+  padding?: number;
+  columns?: number;
+  layout?: 'compact' | 'expanded';
   showLinks: boolean;
+  showLegal?: boolean;
+  showBackToTop?: boolean;
+  footerSections?: Array<{ id: string; title: string; links: Array<{ label: string; href: string }> }>;
 }
 
 interface ThemeData {
@@ -228,7 +237,7 @@ export function DynamicHomePage({
           })),
           socialLinks: (configData.footer?.socialLinks || []).map((link: any) => ({
             id: link.id,
-            platform: link.platform,
+            platform: link.platform || 'social',
             url: link.url,
           })),
           legalLinks: (configData.footer?.legalLinks || []).map((link: any) => ({
@@ -319,16 +328,7 @@ export function DynamicHomePage({
 
   return (
     <div className="bg-white dark:bg-gray-900" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header with error boundary to prevent page breaking on header errors */}
-      <ErrorBoundary section="header" locale={locale}>
-        <Header
-          config={theme.header}
-          isArabic={isRTL}
-          theme={theme}
-        />
-      </ErrorBoundary>
-
-      {/* Main Content */}
+      {/* Main Content - Header/Footer handled at page level for consistency */}
       <main className="bg-white dark:bg-gray-900">
         {visibleComponents.length === 0 ? (
           <div className="min-h-screen flex items-center justify-center py-20">
@@ -367,14 +367,6 @@ export function DynamicHomePage({
           </>
         )}
       </main>
-
-      {/* Footer with error boundary to prevent page breaking on footer errors */}
-      <ErrorBoundary section="footer" locale={locale}>
-        <Footer
-          config={theme.footer}
-          isArabic={isRTL}
-        />
-      </ErrorBoundary>
     </div>
   );
 }
