@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { AlertCircle } from 'lucide-react';
 import { HeaderSSR } from '@/components/header-ssr';
 import { FooterSSR } from '@/components/footer-ssr';
@@ -18,6 +19,10 @@ export const metadata = {
 export default async function CartPage({ params }: CartPageProps) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale || 'en';
+
+  // Get restaurant slug from headers
+  const headersList = await headers();
+  const restaurantSlug = headersList.get('x-restaurant-slug') || 'demo';
 
   // Fetch theme server-side
   let themeData = await getThemeDataServer();

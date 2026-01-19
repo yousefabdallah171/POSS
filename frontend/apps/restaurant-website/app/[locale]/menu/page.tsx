@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { HeaderSSR } from '@/components/header-ssr';
 import { FooterSSR } from '@/components/footer-ssr';
 import { getThemeDataServer, getDefaultThemeData } from '@/lib/api/get-theme-server';
@@ -18,6 +19,10 @@ export default async function MenuPage({ params }: MenuPageProps) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale || 'en';
 
+  // Get restaurant slug from headers
+  const headersList = await headers();
+  const restaurantSlug = headersList.get('x-restaurant-slug') || 'demo';
+
   // Fetch theme server-side
   let themeData = await getThemeDataServer();
   if (!themeData) {
@@ -34,7 +39,7 @@ export default async function MenuPage({ params }: MenuPageProps) {
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        <MenuPageContent locale={locale} themeData={themeDataExtracted} />
+        <MenuPageContent locale={locale} themeData={themeDataExtracted} restaurantSlug={restaurantSlug} />
       </main>
 
       {/* Footer */}

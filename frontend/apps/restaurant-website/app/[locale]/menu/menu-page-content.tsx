@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { ProductCard } from '@/components/product-card';
 import { CategoryFilter } from '@/components/category-filter';
@@ -15,33 +15,21 @@ import type { ServerThemeData } from '@/lib/api/get-theme-server';
 interface MenuPageContentProps {
   locale: 'en' | 'ar';
   themeData: ServerThemeData;
+  restaurantSlug: string;
 }
 
-export function MenuPageContent({ locale, themeData }: MenuPageContentProps) {
+export function MenuPageContent({ locale, themeData, restaurantSlug }: MenuPageContentProps) {
   const pathname = usePathname();
   const localeFromPath = getLocaleFromPath(pathname);
   const isRTL = locale === 'ar';
   const t = createTranslator(locale);
 
-  const [restaurantSlug, setRestaurantSlug] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const addToCart = useCartStore((state) => state.addItem);
   const cartItems = useCartStore((state) => state.getTotalItems());
 
-  // Extract restaurant slug from cookie
-  useEffect(() => {
-    const slug = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('restaurant-slug='))
-      ?.split('=')[1];
-
-    if (slug) {
-      setRestaurantSlug(decodeURIComponent(slug));
-    }
-  }, []);
-
-  // Fetch data from API - only after slug is retrieved
+  // Fetch data from API
   const { data: categoriesResponse, isLoading: categoriesLoading } = useCategories(restaurantSlug);
   const { data: allProductsResponse, isLoading: productsLoading } = useProducts(restaurantSlug);
   const { data: searchResults, isLoading: searchLoading } = useSearchProducts(searchQuery, restaurantSlug);
@@ -82,18 +70,6 @@ export function MenuPageContent({ locale, themeData }: MenuPageContentProps) {
       });
     }
   }, [addToCart]);
-
-  // Show loading while we're waiting for the slug to be extracted
-  if (!restaurantSlug) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader className="h-12 w-12 text-primary mx-auto mb-4 animate-spin" />
-          <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
 
   // Loading state for products
   if (isLoading) {
