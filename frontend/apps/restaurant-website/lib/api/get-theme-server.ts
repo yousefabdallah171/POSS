@@ -108,12 +108,13 @@ export async function getThemeDataServer(
     // Extract theme from nested response structure
     const theme = data.data?.data?.config || data.data?.config || data;
 
-    // Validate required fields
-    if (!theme.identity || !theme.header || !theme.footer) {
-      console.error('Theme missing required fields');
+    // Ensure theme is an object before returning
+    if (typeof theme !== 'object' || theme === null) {
+      console.warn('Theme data is not a valid object');
       return null;
     }
 
+    // Return theme even if some fields are missing - components have defensive fallbacks
     return theme as ServerThemeData;
   } catch (error) {
     console.error('Error fetching theme:', error);
