@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - MyPOS</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+      }
+
+      h1 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      .subtitle {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .status {
+        background: #f5f5f5;
+        border-left: 4px solid #ff6b6b;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        text-align: left;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        margin: 8px 0;
+      }
+
+      .status-item::before {
+        content: '✓';
+        color: #51cf66;
+        margin-right: 10px;
+        font-weight: bold;
+      }
+
+      .status-item.error::before {
+        content: '✗';
+        color: #ff6b6b;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-direction: column;
+      }
+
+      button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: #667eea;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .info {
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 1px solid #eee;
+        font-size: 13px;
+        color: #999;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f0f0f0;
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .network-status {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #51cf66;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .network-status.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .network-status.error {
+        background: #ff6b6b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">📡</div>
+      <h1>You're Offline</h1>
+      <p class="subtitle">
+        It looks like you've lost your internet connection. Don't worry, you can
+        still access cached content.
+      </p>
+
+      <div class="status">
+        <div class="status-item">Cached pages available</div>
+        <div class="status-item">Cached images available</div>
+        <div class="status-item error">API requests unavailable</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="tryReload()">
+          <span class="spinner" id="spinner"></span>
+          <span id="reload-text">Try Again</span>
+        </button>
+        <button class="btn-secondary" onclick="goHome()">Go to Home</button>
+      </div>
+
+      <div class="info">
+        <p>When you're back online, the app will continue working normally.</p>
+      </div>
+    </div>
+
+    <div class="network-status" id="networkStatus"></div>
+
+    <script>
+      // Check connectivity
+      function checkConnection() {
+        if (navigator.onLine) {
+          showNetworkStatus('Back online!', false)
+          setTimeout(() => window.location.reload(), 1000)
+        }
+      }
+
+      function tryReload() {
+        const reloadBtn = document.querySelector('.btn-primary')
+        const spinnerEl = document.getElementById('spinner')
+        const reloadText = document.getElementById('reload-text')
+
+        reloadBtn.disabled = true
+        spinnerEl.style.display = 'inline-block'
+        reloadText.textContent = 'Checking connection...'
+
+        // Try to fetch a small resource to check connectivity
+        fetch('/', { method: 'HEAD', cache: 'no-store' })
+          .then(() => {
+            reloadBtn.disabled = false
+            spinnerEl.style.display = 'none'
+            reloadText.textContent = 'Try Again'
+            window.location.reload()
+          })
+          .catch(() => {
+            reloadBtn.disabled = false
+            spinnerEl.style.display = 'none'
+            reloadText.textContent = 'Still Offline'
+            showNetworkStatus('No connection yet. Please try again.', true)
+          })
+      }
+
+      function goHome() {
+        window.location.href = '/'
+      }
+
+      function showNetworkStatus(message, isError) {
+        const status = document.getElementById('networkStatus')
+        status.textContent = message
+        status.classList.toggle('error', isError)
+        status.classList.add('show')
+
+        setTimeout(() => {
+          status.classList.remove('show')
+        }, 4000)
+      }
+
+      // Listen for online event
+      window.addEventListener('online', () => {
+        checkConnection()
+      })
+
+      // Check connection on page load
+      window.addEventListener('load', () => {
+        if (navigator.onLine) {
+          showNetworkStatus('Back online!', false)
+          setTimeout(() => window.location.reload(), 1000)
+        }
+      })
+
+      // Periodically check connection every 5 seconds
+      setInterval(checkConnection, 5000)
+    </script>
+  </body>
+</html>

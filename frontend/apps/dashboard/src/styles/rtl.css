@@ -1,0 +1,155 @@
+/**
+ * RTL (Right-to-Left) Support Styles
+ * Provides comprehensive RTL support for Arabic and other RTL languages
+ * Date: December 28, 2025
+ */
+
+/* ==========================================
+   Base RTL Direction
+   ========================================== */
+
+[dir='rtl'],
+[dir='RTL'],
+.dir-rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir='ltr'],
+[dir='LTR'],
+.dir-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ==========================================
+   Text Direction Classes
+   ========================================== */
+
+.text-rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.text-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ==========================================
+   Form Elements - RTL Support
+   ========================================== */
+
+[dir='rtl'] input[type='text'],
+[dir='rtl'] input[type='email'],
+[dir='rtl'] textarea,
+[dir='rtl'] select,
+.dir-rtl input[type='text'],
+.dir-rtl input[type='email'],
+.dir-rtl textarea,
+.dir-rtl select {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ==========================================
+   Margin & Padding - RTL Adjustments
+   ========================================== */
+
+[dir='rtl'] .ml-auto,
+.dir-rtl .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir='rtl'] .mr-auto,
+.dir-rtl .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* ==========================================
+   Flex & Layout - RTL Adjustments
+   ========================================== */
+
+[dir='rtl'] .flex-row,
+.dir-rtl .flex-row {
+  flex-direction: row-reverse;
+}
+
+/* ==========================================
+   Icons & Graphics - RTL Transforms
+   ========================================== */
+
+[dir='rtl'] .icon-arrow-right,
+.dir-rtl .icon-arrow-right {
+  transform: scaleX(-1);
+}
+
+[dir='rtl'] .icon-arrow-left,
+.dir-rtl .icon-arrow-left {
+  transform: scaleX(-1);
+}
+
+/* ==========================================
+   Animations - RTL Slide
+   ========================================== */
+
+[dir='rtl'] .slide-in-from-left,
+.dir-rtl .slide-in-from-left {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+[dir='rtl'] .slide-in-from-right,
+.dir-rtl .slide-in-from-right {
+  animation: slideInFromLeft 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ==========================================
+   List & Table - RTL Support
+   ========================================== */
+
+[dir='rtl'] ul,
+[dir='rtl'] ol,
+.dir-rtl ul,
+.dir-rtl ol {
+  margin-right: 1.5rem;
+  margin-left: 0;
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+[dir='rtl'] table,
+.dir-rtl table {
+  direction: rtl;
+}
+
+[dir='rtl'] th,
+[dir='rtl'] td,
+.dir-rtl th,
+.dir-rtl td {
+  text-align: right;
+}
+
+/* ==========================================
+   Accessibility - RTL Support
+   ========================================== */
+
+[dir='rtl'] code,
+[dir='rtl'] pre,
+.dir-rtl code,
+.dir-rtl pre {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+}

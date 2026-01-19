@@ -1,0 +1,204 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #1f2937;
+}
+
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.status.connected {
+  color: #10b981;
+}
+
+.status.disconnected {
+  color: #ef4444;
+}
+
+.participants {
+  color: #6b7280;
+}
+
+.saveButton {
+  padding: 8px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.saveButton:hover {
+  background: #2563eb;
+}
+
+.saveButton:active {
+  transform: scale(0.98);
+}
+
+.editorContainer {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+.editorWrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.textarea {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  border: none;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  color: #1f2937;
+  background: white;
+  tab-size: 2;
+}
+
+.textarea:focus {
+  background: #fafafa;
+}
+
+.textarea::placeholder {
+  color: #9ca3af;
+}
+
+.error {
+  padding: 12px 16px;
+  background: #fee2e2;
+  border-top: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error p {
+  margin: 0;
+}
+
+.error button {
+  padding: 6px 12px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.error button:hover {
+  background: #b91c1c;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.participants {
+  display: flex;
+  gap: 8px;
+}
+
+.participantBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.participantBadge:hover {
+  transform: scale(1.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .editorContainer {
+    flex-direction: column;
+  }
+
+  .statusBar {
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .participants {
+    width: 100%;
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "products",
+  "name": "Products Section",
+  "description": "Display products in grid or list layout with images, prices, and categories",
+  "category": "content",
+  "version": "1.0.0",
+  "compatibility": ["1.0.0"],
+  "deprecated": false,
+  "author": "Design Team",
+  "bilingual": true,
+  "responsive": true,
+  "performance": {
+    "weight": "12KB",
+    "renderTime": "60ms"
+  },
+  "props": {
+    "title_en": "string - English title",
+    "title_ar": "string - Arabic title",
+    "description_en": "string - English description",
+    "description_ar": "string - Arabic description",
+    "isArabic": "boolean - Enable Arabic mode",
+    "config": "object - Configuration object"
+  },
+  "mockData": {
+    "default": "Restaurant products with 6 sample dishes"
+  },
+  "themes": {
+    "usedIn": 0,
+    "versions": ["1.0.0"]
+  }
+}

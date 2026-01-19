@@ -1,0 +1,67 @@
+'use client'
+
+import { ReactNode } from 'react'
+import { usePathname } from 'next/navigation'
+import { createTranslator, getLocaleFromPath } from '@/lib/translations'
+
+interface LocalizedButtonProps {
+  translationKey: string
+  namespace?: string
+  onClick?: () => void
+  disabled?: boolean
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
+  icon?: ReactNode
+  children?: ReactNode
+}
+
+export function LocalizedButton({
+  translationKey,
+  namespace = 'common',
+  onClick,
+  disabled = false,
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  icon,
+  children,
+}: LocalizedButtonProps) {
+  const pathname = usePathname()
+  const locale = getLocaleFromPath(pathname)
+  const t = createTranslator(locale)
+
+  // If children is provided, use it; otherwise try to translate
+  let label: ReactNode = children
+  if (!children && namespace === 'common') {
+    label = t(`common.${translationKey}`) || translationKey
+  } else if (!children) {
+    label = translationKey
+  }
+
+  const baseStyles = 'inline-flex items-center gap-2 font-medium rounded-lg transition-colors'
+
+  const variantStyles = {
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 disabled:bg-primary-400',
+    secondary: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50',
+    danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400',
+    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50',
+  }
+
+  const sizeStyles = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base',
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabled ? 'cursor-not-allowed' : ''} ${className}`}
+    >
+      {icon}
+      {label}
+    </button>
+  )
+}

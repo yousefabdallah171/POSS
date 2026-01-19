@@ -1,0 +1,36 @@
+{
+  "name": "@pos-saas/theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Theme configuration and styling utilities",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./config": {
+      "types": "./theme-config.ts",
+      "default": "./theme-config.ts"
+    },
+    "./provider": {
+      "types": "./theme-provider.tsx",
+      "default": "./theme-provider.tsx"
+    },
+    "./hooks": {
+      "types": "./use-theme.ts",
+      "default": "./use-theme.ts"
+    }
+  },
+  "dependencies": {
+    "next-themes": "^0.4.4",
+    "react": "^18.3.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,277 @@
+import React from 'react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/stores/authStore'
+import LoginPage from '../page'
+import * as api from '@/lib/api'
+
+// Mock dependencies
+jest.mock('next/navigation')
+jest.mock('@/stores/authStore')
+jest.mock('@/lib/api')
+jest.mock('sonner', () => ({
+  toast: {
+    success: jest.fn(),
+    error: jest.fn(),
+    info: jest.fn(),
+  },
+}))
+
+describe('LoginPage - Multi-Tenant Authentication Flow', () => {
+  const mockPush = jest.fn()
+  const mockSetAuth = jest.fn()
+  const mockApiPost = jest.fn()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(useRouter as jest.Mock).mockReturnValue({
+      push: mockPush,
+    })
+    ;(useAuthStore as jest.Mock).mockReturnValue({
+      setAuth: mockSetAuth,
+    })
+    ;(api.default.post as jest.Mock) = mockApiPost
+  })
+
+  describe('Single Tenant Login', () => {
+    it('should auto-login and redirect when user has only one tenant', async () => {
+      const mockResponse = {
+        status: 200,
+        data: {
+          user: {
+            id: 1,
+            email: 'user@test.com',
+            name: 'Test User',
+            role: 'owner',
+            tenant_id: 1,
+          },
+          token: 'mock-jwt-token',
+          multiple_tenants: false,
+        },
+      }
+
+      mockApiPost.mockResolvedValueOnce(mockResponse)
+
+      render(<LoginPage />)
+
+      const emailInput = screen.getByPlaceholderText('your@email.com')
+      const passwordInput = screen.getByPlaceholderText('Enter your password')
+      const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      await userEvent.type(emailInput, 'user@test.com')
+      await userEvent.type(passwordInput, 'password123')
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(mockApiPost).toHaveBeenCalledWith('/auth/login', {
+          email: 'user@test.com',
+          password: 'password123',
+        })
+      })
+
+      await waitFor(() => {
+        expect(mockSetAuth).toHaveBeenCalledWith(mockResponse.data.user, mockResponse.data.token)
+      })
+    })
+  })
+
+  describe('Multi-Tenant Login', () => {
+    it('should show tenant selector modal when user has multiple tenants', async () => {
+      const mockResponse = {
+        status: 200,
+        data: {
+          success: true,
+          multiple_tenants: true,
+          tenants: [
+            {
+              tenant_id: 1,
+              tenant_name: 'Company A',
+              user_id: 1,
+              roles: ['owner'],
+            },
+            {
+              tenant_id: 2,
+              tenant_name: 'Company B',
+              user_id: 2,
+              roles: ['manager'],
+            },
+          ],
+          message: 'Multiple organizations found. Please select one.',
+        },
+      }
+
+      mockApiPost.mockResolvedValueOnce(mockResponse)
+
+      render(<LoginPage />)
+
+      const emailInput = screen.getByPlaceholderText('your@email.com')
+      const passwordInput = screen.getByPlaceholderText('Enter your password')
+      const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      await userEvent.type(emailInput, 'multi@test.com')
+      await userEvent.type(passwordInput, 'password123')
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Select Organization')).toBeInTheDocument()
+      })
+
+      // Check that both tenants are displayed
+      await waitFor(() => {
+        expect(screen.getByText('Company A')).toBeInTheDocument()
+        expect(screen.getByText('Company B')).toBeInTheDocument()
+      })
+    })
+
+    it('should display role badges for each tenant', async () => {
+      const mockResponse = {
+        status: 200,
+        data: {
+          success: true,
+          multiple_tenants: true,
+          tenants: [
+            {
+              tenant_id: 1,
+              tenant_name: 'Company A',
+              user_id: 1,
+              roles: ['owner', 'admin'],
+            },
+          ],
+        },
+      }
+
+      mockApiPost.mockResolvedValueOnce(mockResponse)
+
+      render(<LoginPage />)
+
+      const emailInput = screen.getByPlaceholderText('your@email.com')
+      const passwordInput = screen.getByPlaceholderText('Enter your password')
+      const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      await userEvent.type(emailInput, 'multi@test.com')
+      await userEvent.type(passwordInput, 'password123')
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('owner')).toBeInTheDocument()
+        expect(screen.getByText('admin')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Error Handling', () => {
+    it('should display error message for invalid credentials', async () => {
+      const mockError = {
+        response: {
+          status: 401,
+          data: {
+            error: 'Invalid email or password',
+          },
+        },
+      }
+
+      mockApiPost.mockRejectedValueOnce(mockError)
+
+      render(<LoginPage />)
+
+      const emailInput = screen.getByPlaceholderText('your@email.com')
+      const passwordInput = screen.getByPlaceholderText('Enter your password')
+      const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      await userEvent.type(emailInput, 'wrong@test.com')
+      await userEvent.type(passwordInput, 'wrongpass')
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Invalid email or password')).toBeInTheDocument()
+      })
+    })
+
+    it('should display error for empty email field', async () => {
+      render(<LoginPage />)
+
+      const passwordInput = screen.getByPlaceholderText('Enter your password')
+      const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      await userEvent.type(passwordInput, 'password123')
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Invalid email address')).toBeInTheDocument()
+      })
+    })
+
+    it('should display error for empty password field', async () => {
+      render(<LoginPage />)
+
+      const emailInput = screen.getByPlaceholderText('your@email.com')
+      const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      await userEvent.type(emailInput, 'user@test.com')
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Form Validation', () => {
+    it('should show/hide password when toggle is clicked', async () => {
+      render(<LoginPage />)
+
+      const passwordInput = screen.getByPlaceholderText('Enter your password') as HTMLInputElement
+      const toggleButton = screen.getByRole('button', { name: '' }) // Eye icon button
+
+      expect(passwordInput.type).toBe('password')
+
+      fireEvent.click(toggleButton)
+
+      await waitFor(() => {
+        expect(passwordInput.type).toBe('text')
+      })
+
+      fireEvent.click(toggleButton)
+
+      await waitFor(() => {
+        expect(passwordInput.type).toBe('password')
+      })
+    })
+
+    it('should disable submit button while loading', async () => {
+      mockApiPost.mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 1000))
+      )
+
+      render(<LoginPage />)
+
+      const emailInput = screen.getByPlaceholderText('your@email.com')
+      const passwordInput = screen.getByPlaceholderText('Enter your password')
+      const submitButton = screen.getByRole('button', { name: /sign in/i }) as HTMLButtonElement
+
+      await userEvent.type(emailInput, 'user@test.com')
+      await userEvent.type(passwordInput, 'password123')
+
+      fireEvent.click(submitButton)
+
+      expect(submitButton).toBeDisabled()
+    })
+  })
+
+  describe('Navigation', () => {
+    it('should have link to register page', () => {
+      render(<LoginPage />)
+
+      const registerLink = screen.getByRole('link', { name: /create account/i })
+      expect(registerLink).toHaveAttribute('href', '/auth/register')
+    })
+
+    it('should have link to forgot password page', () => {
+      render(<LoginPage />)
+
+      const forgotLink = screen.getByRole('link', { name: /forgot password/i })
+      expect(forgotLink).toHaveAttribute('href', '/auth/forgot-password')
+    })
+  })
+})

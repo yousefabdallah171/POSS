@@ -1,0 +1,31 @@
+{
+  "id": "cta",
+  "name": "CTA Section",
+  "description": "Call-to-action section with customizable button and background color",
+  "category": "interactive",
+  "version": "1.0.0",
+  "compatibility": ["1.0.0"],
+  "deprecated": false,
+  "author": "Design Team",
+  "bilingual": true,
+  "responsive": true,
+  "performance": {
+    "weight": "5KB",
+    "renderTime": "35ms"
+  },
+  "props": {
+    "title_en": "string - English title",
+    "title_ar": "string - Arabic title",
+    "description_en": "string - English description",
+    "description_ar": "string - Arabic description",
+    "isArabic": "boolean - Enable Arabic mode",
+    "config": "object - Configuration object"
+  },
+  "mockData": {
+    "default": "Call-to-action section with order button"
+  },
+  "themes": {
+    "usedIn": 0,
+    "versions": ["1.0.0"]
+  }
+}

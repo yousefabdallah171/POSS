@@ -1,0 +1,66 @@
+{
+  "name": "@pos-saas/ui-components",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Scalable component library following atomic design principles with auto-discovery",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./atoms": {
+      "import": "./dist/atoms/index.js",
+      "types": "./dist/atoms/index.d.ts"
+    },
+    "./molecules": {
+      "import": "./dist/molecules/index.js",
+      "types": "./dist/molecules/index.d.ts"
+    },
+    "./organisms": {
+      "import": "./dist/organisms/index.js",
+      "types": "./dist/organisms/index.d.ts"
+    },
+    "./templates": {
+      "import": "./dist/templates/index.js",
+      "types": "./dist/templates/index.d.ts"
+    },
+    "./registry": {
+      "import": "./dist/registry/index.js",
+      "types": "./dist/registry/index.d.ts"
+    },
+    "./themes": {
+      "import": "./dist/themes/index.js",
+      "types": "./dist/themes/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "pnpm generate-registry && tsc",
+    "generate-registry": "tsx registry/generate-registry.ts",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "glob": "^10.3.10",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}

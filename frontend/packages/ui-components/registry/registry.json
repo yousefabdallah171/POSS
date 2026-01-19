@@ -1,0 +1,574 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-01-19T03:13:58.602Z",
+  "components": {
+    "why-us-section": {
+      "id": "why-us-section",
+      "name": "Why Us Section",
+      "type": "why-us",
+      "version": "1.0.0",
+      "category": "content",
+      "tags": [
+        "why-us",
+        "features",
+        "benefits",
+        "advantages",
+        "value-prop"
+      ],
+      "industries": [
+        "generic",
+        "restaurant",
+        "retail",
+        "services",
+        "cafe"
+      ],
+      "icon": "✨",
+      "description": "Showcase key features or reasons why customers should choose you",
+      "thumbnail": "./preview.png",
+      "isDraggable": true,
+      "isEditable": true,
+      "isReorderable": true,
+      "isSingleton": false,
+      "isRequired": false,
+      "editorComponent": "WhyChooseUsEditor",
+      "defaultConfig": {
+        "title_en": "Why Choose Us",
+        "title_ar": "لماذا اختيارنا",
+        "description_en": "Discover what makes us special",
+        "description_ar": "اكتشف ما يجعلنا مميزين",
+        "layout": "grid",
+        "columns": 3
+      },
+      "configSchema": {
+        "type": "zod",
+        "schema": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      },
+      "estimatedSize": "medium",
+      "lazyLoadable": true,
+      "documentation": "\n# Why Us Section\n\nShowcase your key features, benefits, or reasons why customers should choose your business.\n\n## Features\n- Grid or flex layout options\n- Configurable number of feature items (1-4)\n- Icon emoji support\n- Feature title and description\n- Hover effects on feature cards\n- Bilingual support (English/Arabic)\n- Responsive grid system\n- RTL support\n\n## Best Practices\n- Keep feature descriptions concise (1-2 sentences)\n- Use relevant icons or emojis\n- Highlight key differentiators\n- Limit to 3-5 key features for clarity\n- Test layout on mobile devices\n- Focus on customer benefits, not just features\n\n## Settings\n- **Title**: Section heading (supports EN/AR)\n- **Description**: Section description (supports EN/AR)\n- **Layout**: Grid or flex view\n- **Columns**: Number of columns in grid (1-4)\n  ",
+      "examples": [
+        {
+          "name": "Restaurant Features",
+          "description": "Key features of a restaurant",
+          "config": {
+            "title_en": "Why Choose Our Restaurant",
+            "title_ar": "لماذا اختيار مطعمنا",
+            "description_en": "We offer the best in every way",
+            "description_ar": "نحن نقدم الأفضل في كل شيء",
+            "layout": "grid",
+            "columns": 3
+          }
+        }
+      ]
+    },
+    "testimonials-section": {
+      "id": "testimonials-section",
+      "name": "Testimonials Section",
+      "type": "testimonials",
+      "version": "1.0.0",
+      "category": "content",
+      "tags": [
+        "testimonials",
+        "reviews",
+        "feedback",
+        "social-proof"
+      ],
+      "industries": [
+        "generic",
+        "restaurant",
+        "retail",
+        "services"
+      ],
+      "icon": "⭐",
+      "description": "Showcase customer testimonials and reviews with star ratings",
+      "thumbnail": "./preview.png",
+      "isDraggable": true,
+      "isEditable": true,
+      "isReorderable": true,
+      "isSingleton": false,
+      "isRequired": false,
+      "editorComponent": "TestimonialsEditor",
+      "defaultConfig": {
+        "title_en": "What Our Customers Say",
+        "title_ar": "ما يقوله عملاؤنا",
+        "layout": "grid"
+      },
+      "configSchema": {
+        "type": "zod",
+        "schema": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      },
+      "estimatedSize": "medium",
+      "lazyLoadable": true,
+      "documentation": "\n# Testimonials Section\n\nDisplay customer testimonials and reviews with star ratings to build trust and social proof.\n\n## Features\n- Grid or carousel layout\n- 5-star rating display\n- Customer quotes and attribution\n- Bilingual support (English/Arabic)\n- Responsive design\n- RTL support\n\n## Best Practices\n- Use real customer quotes\n- Include customer names and titles\n- Display 3-5 testimonials for best impact\n- Use genuine star ratings\n- Include profile images when possible\n\n## Settings\n- **Title**: Section heading (supports EN/AR)\n- **Layout**: Grid or carousel view\n  ",
+      "examples": [
+        {
+          "name": "Restaurant Reviews",
+          "description": "Customer testimonials for a restaurant",
+          "config": {
+            "title_en": "Customer Reviews",
+            "title_ar": "تقييمات العملاء",
+            "layout": "grid"
+          }
+        }
+      ]
+    },
+    "products-section": {
+      "id": "products-section",
+      "name": "Products Section",
+      "type": "products",
+      "version": "1.0.0",
+      "category": "commerce",
+      "tags": [
+        "products",
+        "grid",
+        "ecommerce",
+        "items",
+        "menu"
+      ],
+      "industries": [
+        "generic",
+        "restaurant",
+        "retail",
+        "cafe",
+        "ecommerce"
+      ],
+      "icon": "🛍️",
+      "description": "Display products or menu items in a responsive grid or list layout",
+      "thumbnail": "./preview.png",
+      "isDraggable": true,
+      "isEditable": true,
+      "isReorderable": true,
+      "isSingleton": false,
+      "isRequired": false,
+      "editorComponent": "ProductsEditor",
+      "defaultConfig": {
+        "title_en": "Our Products",
+        "title_ar": "منتجاتنا",
+        "description_en": "Browse our selection",
+        "description_ar": "تصفح تشكيلتنا",
+        "layout": "grid",
+        "columns": 3,
+        "show_prices": true,
+        "show_images": true
+      },
+      "configSchema": {
+        "type": "zod",
+        "schema": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      },
+      "estimatedSize": "large",
+      "lazyLoadable": true,
+      "documentation": "\n# Products Section\n\nDisplay your products, menu items, or services in a responsive grid or list layout.\n\n## Features\n- Grid or list layout options\n- Configurable number of columns (1-4)\n- Price and image display toggles\n- Bilingual support (English/Arabic)\n- Responsive design\n- RTL support\n\n## Best Practices\n- Use consistent image sizes for better alignment\n- Include compelling product descriptions\n- Set appropriate pricing visibility\n- Test layout on mobile devices\n\n## Settings\n- **Title**: Section heading (supports EN/AR)\n- **Description**: Section description (supports EN/AR)\n- **Layout**: Grid or list view\n- **Columns**: Number of columns in grid (1-4)\n- **Show Prices**: Toggle price display\n- **Show Images**: Toggle image display\n  ",
+      "examples": [
+        {
+          "name": "Restaurant Menu",
+          "description": "Food menu with prices and images",
+          "config": {
+            "title_en": "Our Menu",
+            "title_ar": "قائمتنا",
+            "description_en": "Delicious dishes prepared fresh",
+            "description_ar": "أطباق لذيذة معدة طازة",
+            "layout": "grid",
+            "columns": 3,
+            "show_prices": true,
+            "show_images": true
+          }
+        },
+        {
+          "name": "Retail Products",
+          "description": "E-commerce product catalog",
+          "config": {
+            "title_en": "Latest Collection",
+            "title_ar": "أحدث المجموعة",
+            "layout": "grid",
+            "columns": 4,
+            "show_prices": true,
+            "show_images": true
+          }
+        }
+      ]
+    },
+    "hero-section": {
+      "id": "hero-section",
+      "name": "Hero Section",
+      "type": "hero",
+      "version": "1.0.0",
+      "category": "marketing",
+      "tags": [
+        "hero",
+        "banner",
+        "landing",
+        "marketing",
+        "header-section",
+        "cta"
+      ],
+      "industries": [
+        "generic",
+        "restaurant",
+        "retail",
+        "cafe",
+        "services",
+        "portfolio"
+      ],
+      "icon": "🎯",
+      "description": "Full-width hero banner with background image, overlay, headline, and CTA button",
+      "thumbnail": "./preview.png",
+      "isDraggable": true,
+      "isEditable": true,
+      "isReorderable": true,
+      "isSingleton": false,
+      "isRequired": false,
+      "editorComponent": "HeroEditor",
+      "defaultConfig": {
+        "title_en": "Welcome to Our Website",
+        "title_ar": "مرحبا بكم في موقعنا",
+        "subtitle_en": "Discover amazing experiences",
+        "subtitle_ar": "اكتشف تجارب رائعة",
+        "description_en": "",
+        "description_ar": "",
+        "background_image_url": "",
+        "config": {
+          "height": "medium",
+          "overlay_opacity": 0.5,
+          "text_alignment": "center",
+          "cta_button_text": "Learn More",
+          "cta_button_url": "#"
+        }
+      },
+      "configSchema": {
+        "type": "zod",
+        "schema": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      },
+      "estimatedSize": "medium",
+      "lazyLoadable": true,
+      "documentation": "\n# Hero Section\n\nA full-width hero banner perfect for landing pages and section headers.\n\n## Features\n- Background image with adjustable overlay\n- Bilingual support (English/Arabic)\n- Customizable CTA button\n- Responsive design\n- Multiple height options\n- RTL support\n\n## Best Practices\n- Use high-quality images (1920x1080 or larger)\n- Keep headlines short and impactful (5-8 words)\n- Ensure text is readable against background\n- Test on mobile devices\n\n## Settings\n- **Title**: Main headline (supports EN/AR)\n- **Subtitle**: Secondary headline (supports EN/AR)\n- **Description**: Body text (supports EN/AR)\n- **Background Image**: URL to background image\n- **Height**: Hero section height (small/medium/large/full)\n- **Overlay Opacity**: Darkness of overlay (0-1)\n- **Text Alignment**: How to align text (left/center/right)\n- **CTA Button**: Call-to-action button text and URL\n  ",
+      "examples": [
+        {
+          "name": "Restaurant Hero",
+          "description": "Warm, inviting hero for restaurant landing",
+          "config": {
+            "title_en": "Welcome to Our Restaurant",
+            "title_ar": "مرحبا بكم في مطعمنا",
+            "subtitle_en": "Experience authentic flavors",
+            "subtitle_ar": "جرب النكهات الأصيلة",
+            "description_en": "Come join us for an unforgettable dining experience",
+            "description_ar": "انضم إلينا لتجربة طعام لا تنسى",
+            "background_image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+            "height": "large",
+            "overlay_opacity": 0.4,
+            "text_alignment": "center",
+            "cta_button_text": "View Menu",
+            "cta_button_url": "/menu"
+          }
+        },
+        {
+          "name": "Retail Landing",
+          "description": "Modern retail store hero",
+          "config": {
+            "title_en": "Summer Collection 2024",
+            "title_ar": "مجموعة الصيف 2024",
+            "subtitle_en": "Discover latest trends",
+            "subtitle_ar": "اكتشف أحدث الاتجاهات",
+            "background_image_url": "https://images.unsplash.com/photo-1523293182086-7651a899d37f",
+            "height": "large",
+            "overlay_opacity": 0.3,
+            "text_alignment": "right",
+            "cta_button_text": "Shop Now",
+            "cta_button_url": "/shop"
+          }
+        }
+      ]
+    },
+    "cta-section": {
+      "id": "cta-section",
+      "name": "Call to Action",
+      "type": "cta",
+      "version": "1.0.0",
+      "category": "marketing",
+      "tags": [
+        "cta",
+        "call-to-action",
+        "conversion",
+        "button",
+        "action"
+      ],
+      "industries": [
+        "generic",
+        "restaurant",
+        "retail",
+        "ecommerce",
+        "services"
+      ],
+      "icon": "🎯",
+      "description": "Full-width conversion-focused section with customizable button and background",
+      "thumbnail": "./preview.png",
+      "isDraggable": true,
+      "isEditable": true,
+      "isReorderable": true,
+      "isSingleton": false,
+      "isRequired": false,
+      "editorComponent": "CTAEditor",
+      "defaultConfig": {
+        "title_en": "Ready to Get Started?",
+        "title_ar": "هل أنت مستعد للبدء؟",
+        "description_en": "Take action now and enjoy our services",
+        "description_ar": "اتخذ إجراء الآن واستمتع بخدماتنا",
+        "button_text_en": "Get Started",
+        "button_text_ar": "ابدأ الآن",
+        "button_url": "#",
+        "background_color": "#3b82f6"
+      },
+      "configSchema": {
+        "type": "zod",
+        "schema": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      },
+      "estimatedSize": "small",
+      "lazyLoadable": true,
+      "documentation": "\n# Call to Action Section\n\nA conversion-focused full-width section designed to drive user actions with compelling copy and button.\n\n## Features\n- Customizable background color\n- Bold headline and description\n- Primary CTA button with custom URL\n- Bilingual button text (English/Arabic)\n- Responsive design\n- RTL support\n- White text for contrast\n\n## Best Practices\n- Use contrasting background color\n- Keep copy short and action-oriented (3-5 words)\n- Use action verbs (Order, Buy, Sign Up, Learn More)\n- Make button prominent and clickable\n- Test on all device sizes\n- A/B test different colors for conversion\n\n## Settings\n- **Title**: Main headline (supports EN/AR)\n- **Description**: Supporting copy (supports EN/AR)\n- **Button Text**: Button label (supports EN/AR)\n- **Button URL**: Where button links to\n- **Background Color**: Section background color\n  ",
+      "examples": [
+        {
+          "name": "Restaurant Order CTA",
+          "description": "CTA for restaurant ordering",
+          "config": {
+            "title_en": "Ready to Order?",
+            "title_ar": "هل أنت مستعد للطلب؟",
+            "description_en": "Order now and get 10% off your first meal",
+            "description_ar": "اطلب الآن واحصل على خصم 10% على وجبتك الأولى",
+            "button_text_en": "Order Now",
+            "button_text_ar": "اطلب الآن",
+            "button_url": "/order",
+            "background_color": "#e74c3c"
+          }
+        }
+      ]
+    },
+    "contact-section": {
+      "id": "contact-section",
+      "name": "Contact Section",
+      "type": "contact",
+      "version": "1.0.0",
+      "category": "forms",
+      "tags": [
+        "contact",
+        "form",
+        "inquiry",
+        "email",
+        "phone"
+      ],
+      "industries": [
+        "generic",
+        "restaurant",
+        "retail",
+        "services"
+      ],
+      "icon": "📧",
+      "description": "Contact form with contact information and optional map embed",
+      "thumbnail": "./preview.png",
+      "isDraggable": true,
+      "isEditable": true,
+      "isReorderable": true,
+      "isSingleton": false,
+      "isRequired": false,
+      "editorComponent": "ContactEditor",
+      "defaultConfig": {
+        "title_en": "Contact Us",
+        "title_ar": "اتصل بنا",
+        "show_form": true,
+        "show_map": true
+      },
+      "configSchema": {
+        "type": "zod",
+        "schema": {
+          "_def": {
+            "unknownKeys": "strip",
+            "catchall": {
+              "_def": {
+                "typeName": "ZodNever"
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "zod"
+              }
+            },
+            "typeName": "ZodObject"
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "zod"
+          },
+          "_cached": null
+        }
+      },
+      "estimatedSize": "medium",
+      "lazyLoadable": true,
+      "documentation": "\n# Contact Section\n\nEnable visitors to get in touch with a contact form, phone number, email, and address information.\n\n## Features\n- Contact inquiry form\n- Phone number with tel link\n- Email with mailto link\n- Physical address display\n- Optional map embed\n- Bilingual support (English/Arabic)\n- Form validation\n- RTL support\n\n## Best Practices\n- Always show business contact information\n- Make form fields clear and required\n- Include phone number for immediate contact\n- Test form submission on all devices\n- Provide clear success/error messages\n\n## Settings\n- **Title**: Section heading (supports EN/AR)\n- **Show Form**: Toggle contact form display\n- **Show Map**: Toggle map embed display\n  ",
+      "examples": [
+        {
+          "name": "Restaurant Contact",
+          "description": "Contact section for a restaurant",
+          "config": {
+            "title_en": "Get In Touch",
+            "title_ar": "تواصل معنا",
+            "show_form": true,
+            "show_map": true
+          }
+        }
+      ]
+    }
+  },
+  "categories": {
+    "content": [
+      "why-us-section",
+      "testimonials-section"
+    ],
+    "commerce": [
+      "products-section"
+    ],
+    "marketing": [
+      "hero-section",
+      "cta-section"
+    ],
+    "forms": [
+      "contact-section"
+    ]
+  },
+  "industries": {
+    "generic": [
+      "why-us-section",
+      "testimonials-section",
+      "products-section",
+      "hero-section",
+      "cta-section",
+      "contact-section"
+    ],
+    "restaurant": [
+      "why-us-section",
+      "testimonials-section",
+      "products-section",
+      "hero-section",
+      "cta-section",
+      "contact-section"
+    ],
+    "retail": [
+      "why-us-section",
+      "testimonials-section",
+      "products-section",
+      "hero-section",
+      "cta-section",
+      "contact-section"
+    ],
+    "services": [
+      "why-us-section",
+      "testimonials-section",
+      "hero-section",
+      "cta-section",
+      "contact-section"
+    ],
+    "cafe": [
+      "why-us-section",
+      "products-section",
+      "hero-section"
+    ],
+    "ecommerce": [
+      "products-section",
+      "cta-section"
+    ],
+    "portfolio": [
+      "hero-section"
+    ]
+  }
+}

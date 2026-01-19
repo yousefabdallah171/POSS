@@ -1,0 +1,233 @@
+export const translations = {
+  en: {
+    nav: {
+      features: 'Features',
+      pricing: 'Pricing',
+      about: 'About',
+      contact: 'Contact',
+      login: 'Login',
+      getStarted: 'Get Started',
+    },
+    hero: {
+      title: 'Complete Restaurant Management',
+      subtitle: 'System in One Platform',
+      description: 'All-in-one cloud-based POS system with Kitchen Display, Online Ordering, Analytics, and Multi-Restaurant Management',
+      cta: 'Start Free Trial',
+      demo: 'Watch Demo',
+      customers: 'Trusted by 500+ restaurants',
+    },
+    features: {
+      title: 'Everything Your Restaurant Needs',
+      subtitle: 'Powerful features designed for modern restaurants',
+      pos: {
+        title: 'POS System',
+        description: 'Fast, touch-optimized order entry with payment processing and receipt printing',
+      },
+      kitchen: {
+        title: 'Kitchen Display',
+        description: 'Real-time order queue with status updates and chef notifications',
+      },
+      online: {
+        title: 'Online Ordering',
+        description: 'Customizable restaurant website with online ordering and delivery',
+      },
+      analytics: {
+        title: 'Analytics & Reports',
+        description: 'Comprehensive insights into sales, inventory, and staff performance',
+      },
+      multi: {
+        title: 'Multi-Restaurant',
+        description: 'Manage multiple locations from a single dashboard',
+      },
+      mobile: {
+        title: 'Mobile Apps',
+        description: 'iOS and Android apps for staff and customers',
+      },
+    },
+    pricing: {
+      title: 'Simple, Transparent Pricing',
+      subtitle: 'Choose the plan that fits your business',
+      monthly: 'Monthly',
+      yearly: 'Yearly',
+      save: 'Save 20%',
+      free: {
+        name: 'Starter',
+        price: 'Free',
+        description: 'Perfect for trying out',
+        features: [
+          '1 Restaurant',
+          '5 Staff Members',
+          'Basic POS',
+          'Kitchen Display',
+          'Email Support',
+        ],
+        cta: 'Start Free',
+      },
+      pro: {
+        name: 'Professional',
+        price: '$49',
+        period: '/month',
+        description: 'For growing restaurants',
+        features: [
+          '3 Restaurants',
+          'Unlimited Staff',
+          'Full POS System',
+          'Online Ordering',
+          'Analytics & Reports',
+          'Priority Support',
+        ],
+        cta: 'Start Trial',
+        popular: 'Most Popular',
+      },
+      enterprise: {
+        name: 'Enterprise',
+        price: '$149',
+        period: '/month',
+        description: 'For restaurant chains',
+        features: [
+          'Unlimited Restaurants',
+          'Unlimited Staff',
+          'White Label',
+          'Custom Integrations',
+          'Dedicated Support',
+          'SLA Guarantee',
+        ],
+        cta: 'Contact Sales',
+      },
+    },
+    testimonials: {
+      title: 'Loved by Restaurant Owners',
+      subtitle: 'See what our customers say about us',
+    },
+    cta: {
+      title: 'Ready to Transform Your Restaurant?',
+      subtitle: 'Join hundreds of restaurants already using our platform',
+      button: 'Start Free Trial',
+      noCard: 'No credit card required',
+    },
+    footer: {
+      product: 'Product',
+      company: 'Company',
+      support: 'Support',
+      legal: 'Legal',
+      rights: 'All rights reserved.',
+    },
+  },
+  ar: {
+    nav: {
+      features: 'المميزات',
+      pricing: 'الأسعار',
+      about: 'من نحن',
+      contact: 'اتصل بنا',
+      login: 'تسجيل الدخول',
+      getStarted: 'ابدأ الآن',
+    },
+    hero: {
+      title: 'نظام إدارة مطاعم متكامل',
+      subtitle: 'في منصة واحدة',
+      description: 'نظام نقاط بيع سحابي شامل مع شاشة المطبخ والطلب أونلاين والتحليلات وإدارة مطاعم متعددة',
+      cta: 'ابدأ التجربة المجانية',
+      demo: 'شاهد العرض التوضيحي',
+      customers: 'موثوق به من قبل +500 مطعم',
+    },
+    features: {
+      title: 'كل ما يحتاجه مطعمك',
+      subtitle: 'مميزات قوية مصممة للمطاعم الحديثة',
+      pos: {
+        title: 'نظام نقاط البيع',
+        description: 'إدخال طلبات سريع ومحسّن للشاشات التي تعمل باللمس مع معالجة المدفوعات وطباعة الإيصالات',
+      },
+      kitchen: {
+        title: 'شاشة المطبخ',
+        description: 'قائمة انتظار الطلبات في الوقت الفعلي مع تحديثات الحالة وإشعارات الطهاة',
+      },
+      online: {
+        title: 'الطلب أونلاين',
+        description: 'موقع مطعم قابل للتخصيص مع الطلب أونلاين والتوصيل',
+      },
+      analytics: {
+        title: 'التحليلات والتقارير',
+        description: 'رؤى شاملة حول المبيعات والمخزون وأداء الموظفين',
+      },
+      multi: {
+        title: 'مطاعم متعددة',
+        description: 'إدارة عدة فروع من لوحة تحكم واحدة',
+      },
+      mobile: {
+        title: 'تطبيقات الموبايل',
+        description: 'تطبيقات iOS وأندرويد للموظفين والعملاء',
+      },
+    },
+    pricing: {
+      title: 'أسعار بسيطة وشفافة',
+      subtitle: 'اختر الخطة التي تناسب عملك',
+      monthly: 'شهري',
+      yearly: 'سنوي',
+      save: 'وفر 20%',
+      free: {
+        name: 'البداية',
+        price: 'مجاني',
+        description: 'مثالي للتجربة',
+        features: [
+          'مطعم واحد',
+          '5 موظفين',
+          'نقاط بيع أساسية',
+          'شاشة المطبخ',
+          'دعم عبر البريد',
+        ],
+        cta: 'ابدأ مجاناً',
+      },
+      pro: {
+        name: 'احترافي',
+        price: '$49',
+        period: '/شهرياً',
+        description: 'للمطاعم النامية',
+        features: [
+          '3 مطاعم',
+          'موظفين غير محدودين',
+          'نظام نقاط بيع كامل',
+          'الطلب أونلاين',
+          'التحليلات والتقارير',
+          'دعم ذو أولوية',
+        ],
+        cta: 'ابدأ التجربة',
+        popular: 'الأكثر شعبية',
+      },
+      enterprise: {
+        name: 'المؤسسات',
+        price: '$149',
+        period: '/شهرياً',
+        description: 'لسلاسل المطاعم',
+        features: [
+          'مطاعم غير محدودة',
+          'موظفين غير محدودين',
+          'علامة تجارية خاصة',
+          'تكاملات مخصصة',
+          'دعم مخصص',
+          'ضمان SLA',
+        ],
+        cta: 'تواصل مع المبيعات',
+      },
+    },
+    testimonials: {
+      title: 'محبوب من قبل أصحاب المطاعم',
+      subtitle: 'انظر ماذا يقول عملاؤنا عنا',
+    },
+    cta: {
+      title: 'هل أنت مستعد لتحويل مطعمك؟',
+      subtitle: 'انضم إلى مئات المطاعم التي تستخدم منصتنا بالفعل',
+      button: 'ابدأ التجربة المجانية',
+      noCard: 'لا حاجة لبطاقة ائتمان',
+    },
+    footer: {
+      product: 'المنتج',
+      company: 'الشركة',
+      support: 'الدعم',
+      legal: 'قانوني',
+      rights: 'جميع الحقوق محفوظة.',
+    },
+  },
+}
+
+export type Language = 'en' | 'ar'
+export type Translations = typeof translations.en
