@@ -1,14 +1,9 @@
 import { AlertCircle, Home } from 'lucide-react';
 import Link from 'next/link';
 
-interface NotFoundProps {
-  params: {
-    locale: 'en' | 'ar';
-  };
-}
-
-export default function NotFound({ params }: NotFoundProps) {
-  const locale = params.locale || 'en';
+export default function NotFound() {
+  // Use English as default for not-found page
+  const locale = 'en';
   const isRTL = locale === 'ar';
 
   const homeUrl = `/${locale}`;

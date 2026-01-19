@@ -21,20 +21,20 @@ function FooterSSRComponent({
 }: FooterSSRProps) {
   const isRTL = locale === "ar";
 
-  // Use theme values directly from props
-  const footerBgColor = themeData.footer.background_color;
-  const footerTextColor = themeData.footer.text_color;
-  const restaurantName = themeData.identity.site_title;
+  // Use theme values directly from props with fallbacks
+  const footerBgColor = themeData?.footer?.background_color || "#000000";
+  const footerTextColor = themeData?.footer?.text_color || "#ffffff";
+  const restaurantName = themeData?.identity?.site_title || "Restaurant";
   const companyDescription =
-    themeData.footer.company_description ||
+    themeData?.footer?.company_description ||
     (locale === "en"
       ? "Delivering delicious food right to your doorstep with quality and care."
       : "توصيل الطعام اللذيذ إلى باب منزلك بجودة واهتمام.");
-  const address = themeData.footer.address;
-  const phone = themeData.footer.phone;
-  const email = themeData.footer.email;
+  const address = themeData?.footer?.address;
+  const phone = themeData?.footer?.phone;
+  const email = themeData?.footer?.email;
   const copyrightText =
-    themeData.footer.copyright_text ||
+    themeData?.footer?.copyright_text ||
     (locale === "en"
       ? `© ${new Date().getFullYear()} ${restaurantName}. All rights reserved.`
       : `© ${new Date().getFullYear()} ${restaurantName}. جميع الحقوق محفوظة.`);
@@ -124,8 +124,8 @@ function FooterSSRComponent({
               {companyDescription}
             </p>
             <div className="flex gap-4 justify-start">
-              {themeData.footer.social_links &&
-                themeData.footer.social_links.map((link) => {
+              {themeData?.footer?.social_links &&
+                themeData?.footer?.social_links?.map((link) => {
                   const IconComponent =
                     link.platform === "facebook"
                       ? Facebook

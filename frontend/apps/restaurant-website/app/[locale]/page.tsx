@@ -197,7 +197,7 @@ export default async function HomePage({ params }: PageProps) {
         <main className="flex-1 w-full">
           <DynamicHomePage
             initialHomepageData={homepageData}
-            initialThemeData={themeData}
+            initialThemeData={themeDataExtracted}
             initialProductsData={productsData}
             restaurantSlug={restaurantSlug}
             locale={locale}

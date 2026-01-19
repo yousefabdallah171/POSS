@@ -25,33 +25,33 @@ function HeaderSSRComponent({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isRTL = locale === "ar";
 
-  // Use theme values directly from props
-  const restaurantName = themeData.identity.site_title;
-  const logoUrl = themeData.identity.logo_url;
-  const headerBgColor = themeData.header.background_color;
-  const headerTextColor = themeData.header.text_color;
+  // Use theme values directly from props with fallbacks
+  const restaurantName = themeData?.identity?.site_title || "Restaurant";
+  const logoUrl = themeData?.identity?.logo_url || "";
+  const headerBgColor = themeData?.header?.background_color || "#ffffff";
+  const headerTextColor = themeData?.header?.text_color || "#000000";
   const headerTagline =
-    themeData.header.tagline ||
+    themeData?.header?.tagline ||
     (locale === "en" ? "Order Food Online" : "اطلب الطعام أونلاين");
 
   // Use navigation items from theme, or default locale-aware links
-  const navLinks =
-    themeData.header.navigation_items && themeData.header.navigation_items.length > 0
-      ? themeData.header.navigation_items.map((item) => ({
-          href: item.href.startsWith("/") ? `/${locale}${item.href}` : item.href,
-          label: item.label,
-        }))
-      : [
-          { href: `/${locale}/menu`, label: locale === "en" ? "Menu" : "القائمة" },
-          {
-            href: `/${locale}/orders`,
-            label: locale === "en" ? "Orders" : "الطلبات",
-          },
-          {
-            href: `/${locale}/settings`,
-            label: locale === "en" ? "Settings" : "الإعدادات",
-          },
-        ];
+  const themeLinkItems = themeData?.header?.navigation_items ?? [];
+  const navLinks = themeLinkItems.length > 0
+    ? themeLinkItems.map((item) => ({
+        href: item.href.startsWith("/") ? `/${locale}${item.href}` : item.href,
+        label: item.label,
+      }))
+    : [
+        { href: `/${locale}/menu`, label: locale === "en" ? "Menu" : "القائمة" },
+        {
+          href: `/${locale}/orders`,
+          label: locale === "en" ? "Orders" : "الطلبات",
+        },
+        {
+          href: `/${locale}/settings`,
+          label: locale === "en" ? "Settings" : "الإعدادات",
+        },
+      ];
 
   return (
     <header

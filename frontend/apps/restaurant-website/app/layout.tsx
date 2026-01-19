@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Poppins } from "next/font/google";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -22,15 +22,16 @@ const poppins = Poppins({
   preload: true,
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
+
 export const metadata: Metadata = {
   title: "Restaurant Menu & Ordering",
   description: "Order delicious food from your favorite restaurant",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   robots: {
     index: true,
     follow: true,

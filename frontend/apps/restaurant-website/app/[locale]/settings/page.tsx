@@ -24,18 +24,21 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
     themeData = getDefaultThemeData();
   }
 
+  // Extract theme from nested response structure
+  const themeDataExtracted = themeData.data?.data?.config || themeData.data?.config || themeData;
+
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       {/* Header */}
-      <HeaderSSR themeData={themeData} locale={locale} cartItemsCount={0} />
+      <HeaderSSR themeData={themeDataExtracted} locale={locale} cartItemsCount={0} />
 
       {/* Main Content */}
       <main className="flex-1 w-full">
-        <SettingsPageContent locale={locale} themeData={themeData} />
+        <SettingsPageContent locale={locale} themeData={themeDataExtracted} />
       </main>
 
       {/* Footer */}
-      <FooterSSR themeData={themeData} locale={locale} />
+      <FooterSSR themeData={themeDataExtracted} locale={locale} />
     </div>
   );
 }
