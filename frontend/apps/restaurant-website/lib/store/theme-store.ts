@@ -164,9 +164,9 @@ export const useThemeStore = create<ThemeStoreState>()(
       error: null,
 
       /**
-       * Load theme from API
+       * Load theme from API with retry logic
        * Checks memory cache first, then localStorage (via persist), then API
-       * Falls back to default theme on error
+       * Retries up to 2 times on failure, then falls back to default theme
        */
       loadTheme: async (slug: string) => {
         // Check memory cache first (fastest)
@@ -177,34 +177,53 @@ export const useThemeStore = create<ThemeStoreState>()(
         }
 
         set({ isLoading: true, error: null })
-        try {
-          // Import API function here to avoid circular dependency
-          const { getThemeBySlug } = await import('@/lib/api/theme-api')
-          const theme = await getThemeBySlug(slug)
 
-          // Cache the theme in memory
-          memoryCache.set(slug, theme)
+        const MAX_RETRIES = 2
+        let lastError: Error | null = null
 
-          set({ currentTheme: theme, isLoading: false, error: null })
-        } catch (error) {
-          console.error(`Failed to load theme: ${slug}`, error)
-
-          // Load default theme on error
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
           try {
-            const { getDefaultTheme } = await import('@/lib/utils/default-theme')
-            const defaultTheme = getDefaultTheme()
-            set({
-              currentTheme: defaultTheme,
-              isLoading: false,
-              error: error instanceof Error ? error.message : 'Failed to load theme',
-            })
-          } catch (defaultError) {
-            set({
-              currentTheme: null,
-              isLoading: false,
-              error: 'Failed to load both theme and default fallback',
-            })
+            // Import API function here to avoid circular dependency
+            const { getThemeBySlug } = await import('@/lib/api/theme-api')
+            const theme = await getThemeBySlug(slug)
+
+            // Cache the theme in memory
+            memoryCache.set(slug, theme)
+
+            set({ currentTheme: theme, isLoading: false, error: null })
+            return // Success - exit early
+          } catch (error) {
+            lastError = error instanceof Error ? error : new Error('Unknown error')
+
+            // Log retry attempts in development
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`Theme load attempt ${attempt + 1}/${MAX_RETRIES + 1} failed:`, error)
+            }
+
+            // Wait before retry (exponential backoff)
+            if (attempt < MAX_RETRIES) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
+            }
           }
+        }
+
+        // All retries failed - load default theme
+        console.error(`Failed to load theme after ${MAX_RETRIES + 1} attempts: ${slug}`, lastError)
+
+        try {
+          const { getDefaultTheme } = await import('@/lib/utils/default-theme')
+          const defaultTheme = getDefaultTheme()
+          set({
+            currentTheme: defaultTheme,
+            isLoading: false,
+            error: lastError?.message || 'Failed to load theme',
+          })
+        } catch (defaultError) {
+          set({
+            currentTheme: null,
+            isLoading: false,
+            error: 'Failed to load both theme and default fallback',
+          })
         }
       },
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { memo } from "react";
 import { Facebook, Instagram, Twitter, Phone, Mail, MapPin } from "lucide-react";
 import { useThemeFooter, useThemeIdentity } from "@/lib/hooks/use-theme";
+import { FooterSkeleton } from "./skeletons";
 
 interface FooterProps {
   locale?: "en" | "ar";
@@ -15,23 +16,33 @@ interface FooterProps {
  */
 function FooterComponent({ locale = "en", restaurantName: defaultName = "Restaurant" }: FooterProps) {
   const isRTL = locale === "ar";
+
+  // Get typed theme data with loading states
   const themeFooter = useThemeFooter();
   const themeIdentity = useThemeIdentity();
 
-  // Use theme data or fallback
-  const footerBgColor = themeFooter?.background_color || "#111827";
-  const footerTextColor = themeFooter?.text_color || "#f3f4f6";
-  const restaurantName = themeIdentity?.site_title || defaultName;
-  const companyDescription = themeFooter?.company_description || (
+  // Show skeleton while theme is loading
+  if (themeFooter.isLoading || themeIdentity.isLoading) {
+    return <FooterSkeleton />;
+  }
+
+  // Use typed theme values (hooks already handle defaults)
+  const footerBgColor = themeFooter.backgroundColor;
+  const footerTextColor = themeFooter.textColor;
+  const restaurantName = themeIdentity.siteTitle || defaultName;
+  const companyDescription = themeFooter.companyDescription || (
     locale === "en"
       ? "Delivering delicious food right to your doorstep with quality and care."
       : "توصيل الطعام اللذيذ إلى باب منزلك بجودة واهتمام."
   );
-  // Use theme data, NOT hardcoded fallbacks (prevents fake contact info)
-  const address = themeFooter?.address || "";
-  const phone = themeFooter?.phone || "";
-  const email = themeFooter?.email || "";
-  const copyrightText = themeFooter?.copyright_text || (locale === "en" ? `© ${new Date().getFullYear()} ${restaurantName}. All rights reserved.` : `© ${new Date().getFullYear()} ${restaurantName}. جميع الحقوق محفوظة.`);
+  const address = themeFooter.address;
+  const phone = themeFooter.phone;
+  const email = themeFooter.email;
+  const copyrightText = themeFooter.copyrightText || (
+    locale === "en"
+      ? `© ${new Date().getFullYear()} ${restaurantName}. All rights reserved.`
+      : `© ${new Date().getFullYear()} ${restaurantName}. جميع الحقوق محفوظة.`
+  );
 
   const sections = {
     en: {
@@ -108,39 +119,27 @@ function FooterComponent({ locale = "en", restaurantName: defaultName = "Restaur
               {companyDescription}
             </p>
             <div className="flex gap-4 justify-start">
-              {themeFooter?.social_links?.facebook && (
-                <Link
-                  href={themeFooter.social_links.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-opacity hover:opacity-80"
-                  style={{ color: footerTextColor, opacity: 0.8 }}
-                >
-                  <Facebook className="h-5 w-5" />
-                </Link>
-              )}
-              {themeFooter?.social_links?.instagram && (
-                <Link
-                  href={themeFooter.social_links.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-opacity hover:opacity-80"
-                  style={{ color: footerTextColor, opacity: 0.8 }}
-                >
-                  <Instagram className="h-5 w-5" />
-                </Link>
-              )}
-              {themeFooter?.social_links?.twitter && (
-                <Link
-                  href={themeFooter.social_links.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-opacity hover:opacity-80"
-                  style={{ color: footerTextColor, opacity: 0.8 }}
-                >
-                  <Twitter className="h-5 w-5" />
-                </Link>
-              )}
+              {themeFooter.socialLinks.map((link) => {
+                const IconComponent =
+                  link.platform === 'facebook' ? Facebook :
+                  link.platform === 'instagram' ? Instagram :
+                  link.platform === 'twitter' ? Twitter : null;
+
+                if (!IconComponent) return null;
+
+                return (
+                  <Link
+                    key={link.platform}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-opacity hover:opacity-80"
+                    style={{ color: footerTextColor, opacity: 0.8 }}
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
