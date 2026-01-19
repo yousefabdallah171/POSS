@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { HeaderSSR } from '@/components/header-ssr';
 import { FooterSSR } from '@/components/footer-ssr';
 import { getThemeDataServer, getDefaultThemeData } from '@/lib/api/get-theme-server';
@@ -17,6 +18,10 @@ export const metadata = {
 export default async function OrdersPage({ params }: OrdersPageProps) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale || 'en';
+
+  // Get restaurant slug from headers
+  const headersList = await headers();
+  const restaurantSlug = headersList.get('x-restaurant-slug') || 'demo';
 
   // Fetch theme server-side
   let themeData = await getThemeDataServer();
