@@ -256,7 +256,10 @@
       "Bash(do rm -f \"$f\")",
       "Bash(for file in components/cart.tsx components/checkout-form.tsx components/theme-selector.tsx)",
       "Bash(do sed -i 's/const themeColors = useThemeColors\\(\\);/const themeColors = useThemeColors\\(\\) as any;/g' \"$file\")",
-      "Bash(npx next build)"
+      "Bash(npx next build)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\OPT\\\\Desktop\\\\POS\\\\frontend\\\\apps\\\\restaurant-website\\\\.next\" -Recurse -Force -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\OPT\\\\Desktop\\\\POS\\\\frontend\\\\apps\\\\dashboard\\\\.next\" -Recurse -Force -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\OPT\\\\Desktop\\\\POS\\\\frontend\\\\apps\\\\landing\\\\.next\" -Recurse -Force -ErrorAction SilentlyContinue)"
     ]
   }
 }

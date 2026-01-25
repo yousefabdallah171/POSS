@@ -26,30 +26,55 @@ export function SubdomainProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    try {
-      // Get subdomain info from cookies set by middleware
-      const restaurantSlug = getCookie("restaurant-slug");
-      const isRestaurantSite = getCookie("is-restaurant-site") === "true";
+    async function initContext() {
+      try {
+        // Get subdomain info from cookies set by middleware
+        const restaurantSlug = getCookie("restaurant-slug");
+        const isRestaurantSite = getCookie("is-restaurant-site") === "true";
 
-      // Get host from window.location
-      const host = typeof window !== "undefined" ? window.location.host : "";
+        // Get host from window.location
+        const host = typeof window !== "undefined" ? window.location.host : "";
 
-      setContext({
-        subdomain: restaurantSlug || null,
-        isRestaurantSite,
-        isMainSite: !isRestaurantSite,
-        slug: restaurantSlug || null,
-        host,
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      setContext((prev) => ({
-        ...prev,
-        loading: false,
-        error: error instanceof Error ? error.message : "Failed to parse subdomain",
-      }));
+        // If we have a restaurant slug, fetch the restaurant info to get IDs
+        if (restaurantSlug && isRestaurantSite && typeof window !== "undefined") {
+          try {
+            const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api/v1";
+            const response = await fetch(`${apiBase}/public/restaurants/${restaurantSlug}/info`);
+            if (response.ok) {
+              const data = await response.json();
+              // Store tenant and restaurant IDs for API client to use
+              // The /info endpoint returns fields directly: { tenant_id, id, name, ... }
+              if (data?.tenant_id) {
+                localStorage.setItem("tenant-id", String(data.tenant_id));
+              }
+              if (data?.id) {
+                localStorage.setItem("restaurant-id", String(data.id));
+              }
+            }
+          } catch (fetchError) {
+            console.warn("[SubdomainProvider] Failed to fetch restaurant info:", fetchError);
+          }
+        }
+
+        setContext({
+          subdomain: restaurantSlug || null,
+          isRestaurantSite,
+          isMainSite: !isRestaurantSite,
+          slug: restaurantSlug || null,
+          host,
+          loading: false,
+          error: null,
+        });
+      } catch (error) {
+        setContext((prev) => ({
+          ...prev,
+          loading: false,
+          error: error instanceof Error ? error.message : "Failed to parse subdomain",
+        }));
+      }
     }
+
+    initContext();
   }, []);
 
   return (

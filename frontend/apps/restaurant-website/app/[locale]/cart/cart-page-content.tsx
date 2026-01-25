@@ -63,9 +63,8 @@ export function CartPageContent({ locale, themeData }: CartPageContentProps) {
       {/* Main Content */}
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRTL ? 'text-right' : ''}`}>
         <div
-          className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${
-            isRTL ? 'lg:grid-flow-col-dense' : ''
-          }`}
+          className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${isRTL ? 'lg:grid-flow-col-dense' : ''
+            }`}
         >
           {/* Cart Items */}
           <div className={`lg:col-span-2 ${isRTL ? 'lg:order-2' : ''}`}>
@@ -81,9 +80,8 @@ export function CartPageContent({ locale, themeData }: CartPageContentProps) {
 
               {/* Items Summary */}
               <div
-                className={`space-y-2 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 ${
-                  isRTL ? 'text-right' : ''
-                }`}
+                className={`space-y-2 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700 ${isRTL ? 'text-right' : ''
+                  }`}
               >
                 <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <span className="text-gray-600 dark:text-gray-400">
@@ -120,14 +118,13 @@ export function CartPageContent({ locale, themeData }: CartPageContentProps) {
                 </div>
 
                 <div
-                  className={`flex justify-between text-lg border-t border-gray-200 dark:border-gray-700 pt-3 ${
-                    isRTL ? 'flex-row-reverse' : ''
-                  }`}
+                  className={`flex justify-between text-lg border-t border-gray-200 dark:border-gray-700 pt-3 ${isRTL ? 'flex-row-reverse' : ''
+                    }`}
                 >
                   <span className="font-bold">{t('common.total')}</span>
                   <span
                     className="text-2xl font-bold"
-                    style={{ color: themeData.colors.primary }}
+                    style={{ color: primaryColor }}
                   >
                     $
                     {(
@@ -143,7 +140,7 @@ export function CartPageContent({ locale, themeData }: CartPageContentProps) {
                 <Button
                   className="w-full py-3 text-lg"
                   style={{
-                    backgroundColor: themeData.colors.primary,
+                    backgroundColor: primaryColor,
                   }}
                 >
                   {t('cart.proceedToCheckout')}

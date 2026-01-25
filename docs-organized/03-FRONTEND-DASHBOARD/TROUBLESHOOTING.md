@@ -1,4 +1,242 @@
-# Phase 3 Troubleshooting Guide
+# Troubleshooting Guide - Frontend & API Integration
+
+**Purpose:** Solve common issues in frontend development and API integration
+**Last Updated:** 2026-01-20
+
+---
+
+## 🔴 CRITICAL ISSUES - API Response Mapping
+
+### Issue: Products Not Displaying (Shows 0 items)
+
+**Symptom**: Menu/Products page shows "0 items" or "No items found" despite backend returning data
+
+**Root Cause**: API response field double-nesting
+- API Client's `.get()` method returns `response.data` which is already the parsed JSON
+- Query hooks were treating response as nested: `response.data?.products`
+- This causes: `undefined?.products` → `undefined` → empty array
+
+**Solution:**
+
+Check your API response structure first:
+```bash
+# Test the API endpoint directly
+curl "http://localhost:8080/api/v1/public/restaurants/demo/products"
+
+# Should return structure like:
+# {
+#   "products": [...],
+#   "categories": [...]
+# }
+```
+
+Then check your React Query hooks - they should NOT double-nest the response:
+
+```typescript
+// ❌ WRONG - Double nesting
+export function useProducts(restaurantSlug: string) {
+  return useQuery({
+    queryFn: async () => {
+      const response = await apiClient.get(`/public/restaurants/${restaurantSlug}/products`);
+      return response.data?.products || [];  // ❌ response is already data
+    },
+  });
+}
+
+// ✅ CORRECT - No double nesting
+export function useProducts(restaurantSlug: string) {
+  return useQuery({
+    queryFn: async () => {
+      const response = await apiClient.get(`/public/restaurants/${restaurantSlug}/products`);
+      return response?.products || [];  // ✅ response is already parsed
+    },
+  });
+}
+```
+
+**Files to Check**:
+- `lib/hooks/use-api-queries.ts` - Check all query functions
+- Look for: `response.data?.products`, `response.data?.categories`, etc.
+- Replace with: `response?.products`, `response?.categories`, etc.
+
+**All Functions That Need Fixing**:
+- `useProducts()` → return `response?.products`
+- `useCategories()` → return `response?.categories`
+- `useProductsByCategory()` → return `response?.products`
+- `useSearchProducts()` → return `response?.products`
+- `useOrders()` → return `response`
+- `useOrder()` → return `response`
+- `useOrderByNumber()` → return `response`
+- `useOrderStatus()` → return `response`
+- `useTrackOrder()` → return `response`
+- `useCreateOrder()` → response structure may differ
+- `useCancelOrder()` → response structure may differ
+
+**Verification**:
+```bash
+# After fixing, check:
+# 1. Menu page should show products
+# 2. Products should have images, names, prices
+# 3. Add to cart button should work
+# 4. Cart should update
+```
+
+---
+
+### Issue: React Query Retrying Too Much (Infinite Loops)
+
+**Symptom**: Browser freezing, RAM/CPU at 100%, network tab shows hundreds of API calls
+
+**Root Cause**: React Query default `retry: 3` causes exponential retries
+- Failed queries retry 3 times with exponential backoff
+- Each retry triggers re-render → triggers new queries
+- Multiple failing hooks amplify the problem exponentially
+- Results in hundreds of API calls in seconds
+
+**Example of Exponential Explosion**:
+```
+Query fails:
+  1st try: 1 API call
+  Retry 1: 1 API call
+  Retry 2: 1 API call
+  Retry 3: 1 API call
+= 4 API calls per query
+
+With 3 failing queries × 5 re-renders = 60+ API calls
+Each re-render triggers NEW queries = exponential growth
+```
+
+**Solution**:
+
+Add explicit retry configuration to ALL React Query hooks:
+
+```typescript
+// ❌ BEFORE - Missing retry config
+export function useProducts(restaurantSlug: string) {
+  return useQuery({
+    queryKey: queryKeys.products(restaurantSlug),
+    queryFn: async () => { /* ... */ },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    // Uses default: retry: 3 ❌
+  });
+}
+
+// ✅ AFTER - Explicit retry limits
+export function useProducts(restaurantSlug: string) {
+  return useQuery({
+    queryKey: queryKeys.products(restaurantSlug),
+    queryFn: async () => { /* ... */ },
+    enabled: !!restaurantSlug,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,           // ✅ Max 1 retry instead of 3
+    retryDelay: 1000,   // ✅ 1 second between retries
+  });
+}
+```
+
+**Apply to All Hooks**:
+
+File: `lib/hooks/use-api-queries.ts`
+
+Add to EVERY `useQuery` call:
+```typescript
+retry: 1,           // Limit retries
+retryDelay: 1000,   // Delay between retries
+```
+
+**Special Case - Search**:
+```typescript
+// Search should NOT retry (user might type slow)
+export function useSearchProducts(query: string, restaurantSlug: string) {
+  return useQuery({
+    // ... other config
+    retry: 0,  // Don't retry search
+  });
+}
+```
+
+**Verification**:
+```bash
+# After fixing:
+# 1. Open DevTools Network tab
+# 2. Load menu page
+# 3. Should see ~2-3 API calls (not hundreds)
+# 4. RAM should stay < 500MB
+# 5. CPU should stay < 20%
+# 6. Page should load in < 5 seconds
+```
+
+---
+
+## 🟠 COMMON ISSUES - Performance
+
+### Issue: Page Loading Takes 15+ Seconds
+
+**Symptom**: Menu page takes very long to load despite few products
+
+**Root Cause**: Heavy components with hooks making extra API calls
+- Components calling hooks for every item renders (e.g., ProductCard with useThemeColors)
+- 10 products = 10 hook calls = 10+ extra API calls
+- Creates network waterfall: wait for products → render cards → each card fetches theme
+
+**Solution**:
+
+1. Check for unnecessary hooks in rendered components:
+
+```typescript
+// ❌ BAD - ProductCard calls hook for each item
+export function ProductCard({ product }: ProductCardProps) {
+  const theme = useThemeColors();  // ❌ Hook called 10 times
+  return <div style={{ color: theme.primary }}>{product.name}</div>;
+}
+
+// Usage:
+products.map(p => <ProductCard product={p} />)  // 10 products = 10 hook calls
+
+// ✅ GOOD - Theme passed as prop, no hooks in card
+export function ProductCard({ product, themeColors }: ProductCardProps) {
+  return <div style={{ color: themeColors.primary }}>{product.name}</div>;
+}
+
+// Usage:
+products.map(p => <ProductCard product={p} themeColors={theme} />)  // No extra calls
+```
+
+2. Create lightweight versions of components if needed:
+
+```typescript
+// components/product-card-simple.tsx - Pure presentation, NO hooks
+export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  return (
+    <div className="border rounded-lg p-4">
+      <img src={product.image} alt={product.name} />
+      <h3>{product.name}</h3>
+      <p>${product.price}</p>
+      <button onClick={() => onAddToCart(product, 1)}>Add to Cart</button>
+    </div>
+  );
+}
+```
+
+3. Measure where time is spent:
+
+```typescript
+// In browser console
+const start = performance.now();
+// ... trigger page load
+console.log(`Page load: ${performance.now() - start}ms`);
+
+// In DevTools Network tab:
+// - Check which requests are slow
+// - Look for sequential (waterfall) requests
+// - Parallel requests should load faster
+```
+
+---
+
+## Phase 3 Troubleshooting Guide
 
 **Purpose:** Solve common issues during Phase 3 implementation
 **Last Updated:** 2026-01-07

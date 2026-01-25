@@ -20,7 +20,7 @@ const checkoutSchema = z.object({
   customerPhone: z.string().min(10, 'Phone is required'),
   deliveryAddress: z.string().min(5, 'Address is required'),
   specialInstructions: z.string().optional(),
-  paymentMethod: z.enum(['credit_card', 'debit_card', 'cash', 'paypal']),
+  paymentMethod: z.literal('cash'),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -56,6 +56,9 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
     reset,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      paymentMethod: 'cash',
+    },
   });
 
   const deliveryFee = cartTotal > 50 ? 0 : 5.99;
@@ -103,30 +106,34 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
   const onSubmit = (data: CheckoutFormData) => {
     setError(null);
 
+    // Transform cart items to backend format (snake_case)
+    const orderItems = cartItems.map((item) => ({
+      product_id: item.productId,
+      quantity: item.quantity,
+      special_instructions: item.notes || '',
+    }));
+
+    // Debug payload
+    console.log('[Checkout] Submitting order items:', orderItems);
+
     createOrder(
       {
-        customerName: data.customerName,
-        customerEmail: data.customerEmail,
-        customerPhone: data.customerPhone,
-        deliveryAddress: data.deliveryAddress,
-        paymentMethod: data.paymentMethod,
-        specialInstructions: data.specialInstructions,
-        items: cartItems.map((item) => ({
-          productId: item.productId,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          notes: item.notes,
-        })),
-      },
+        customer_name: data.customerName,
+        customer_email: data.customerEmail,
+        customer_phone: data.customerPhone,
+        delivery_address: data.deliveryAddress,
+        payment_method: data.paymentMethod,
+        notes: data.specialInstructions || '',
+        items: orderItems,
+      } as any,
       {
         onSuccess: (response) => {
-          setSuccessOrderNumber(response.orderNumber);
+          setSuccessOrderNumber(response.data.orderNumber);
           clearCart();
           reset();
         },
         onError: (err: any) => {
-          const message = err.response?.data?.message || t('errors.somethingWentWrong');
+          const message = err.response?.data?.error || err.response?.data?.message || t('errors.somethingWentWrong');
           setError(message);
         },
       }
@@ -243,40 +250,21 @@ export function CheckoutPageContent({ locale, themeData }: CheckoutPageContentPr
                 {/* Payment Method */}
                 <div>
                   <h2 className="text-2xl font-bold mb-4">{t('checkout.paymentMethod')}</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">{t('checkout.selectPaymentMethod')}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {[
-                      { value: 'credit_card', label: t('checkout.creditCard') },
-                      { value: 'debit_card', label: t('checkout.debitCard') },
-                      { value: 'cash', label: t('checkout.cash') },
-                      { value: 'paypal', label: t('checkout.paypal') },
-                    ].map((method) => (
-                      <label key={method.value} className="relative">
-                        <input
-                          {...register('paymentMethod')}
-                          type="radio"
-                          value={method.value}
-                          className="sr-only"
-                        />
-                        <div
-                          className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                            // @ts-ignore
-                            register('paymentMethod').name === method.value
-                              ? 'bg-primary/10'
-                              : 'border-gray-300 dark:border-gray-600 hover:border-primary'
-                          }`}
-                          style={{
-                            borderColor:
-                              // @ts-ignore
-                              register('paymentMethod').name === method.value
-                                ? primaryColor
-                                : undefined,
-                          }}
-                        >
-                          <span className="font-semibold">{method.label}</span>
-                        </div>
-                      </label>
-                    ))}
+                  <div
+                    className="p-4 border-2 rounded-lg bg-green-50 dark:bg-green-900/20"
+                    style={{ borderColor: primaryColor }}
+                  >
+                    <input
+                      {...register('paymentMethod')}
+                      type="hidden"
+                      value="cash"
+                    />
+                    <span className="font-semibold text-green-700 dark:text-green-400">
+                      💵 {t('checkout.cash')} (Cash on Delivery)
+                    </span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      Pay when your order arrives
+                    </p>
                   </div>
                 </div>
 

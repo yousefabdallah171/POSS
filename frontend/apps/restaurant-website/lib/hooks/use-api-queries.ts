@@ -82,11 +82,13 @@ export function useCategories(restaurantSlug: string) {
       const response = await apiClient.get<any>(
         `/public/restaurants/${restaurantSlug}/categories?lang=en`
       );
-      return response.data?.categories || [];
+      return response?.categories || [];
     },
     enabled: !!restaurantSlug,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -101,11 +103,13 @@ export function useProducts(restaurantSlug: string) {
       const response = await apiClient.get<any>(
         `/public/restaurants/${restaurantSlug}/products?lang=en`
       );
-      return response.data?.products || [];
+      return response?.products || [];
     },
     enabled: !!restaurantSlug,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -120,11 +124,13 @@ export function useProductsByCategory(categoryId: number, restaurantSlug: string
       const response = await apiClient.get<any>(
         `/public/restaurants/${restaurantSlug}/categories/${categoryId}/products?lang=en`
       );
-      return response.data?.products || [];
+      return response?.products || [];
     },
     enabled: !!restaurantSlug && !!categoryId,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -141,11 +147,12 @@ export function useSearchProducts(query: string, restaurantSlug: string) {
         `/public/restaurants/${restaurantSlug}/search?q=${encodeURIComponent(query)}&lang=en`,
         signal
       );
-      return response.data?.products || [];
+      return response?.products || [];
     },
     enabled: !!restaurantSlug && query.length > 0,
     staleTime: 2 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
+    retry: 0,
   });
 }
 
@@ -157,10 +164,12 @@ export function useOrders() {
     queryKey: queryKeys.orders(),
     queryFn: async () => {
       const response = await apiClient.get<OrderListResponse>("/public/orders");
-      return response.data;
+      return response;
     },
     staleTime: 1 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -172,11 +181,13 @@ export function useOrder(orderId: number) {
     queryKey: queryKeys.orderById(orderId),
     queryFn: async () => {
       const response = await apiClient.get<OrderResponse>(`/public/orders/${orderId}`);
-      return response.data;
+      return response;
     },
     enabled: !!orderId,
-    staleTime: 30 * 1000, // 30 seconds for live tracking
+    staleTime: 30 * 1000,
     gcTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -188,11 +199,13 @@ export function useOrderByNumber(orderNumber: string) {
     queryKey: queryKeys.orderByNumber(orderNumber),
     queryFn: async () => {
       const response = await apiClient.get<OrderResponse>(`/public/orders/number/${orderNumber}`);
-      return response.data;
+      return response;
     },
     enabled: !!orderNumber && orderNumber.length > 0,
     staleTime: 30 * 1000,
     gcTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -213,7 +226,7 @@ export function useCreateOrder() {
       specialInstructions?: string;
     }) => {
       const response = await apiClient.post<OrderResponse>("/public/orders", orderData);
-      return response.data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.orders() });
@@ -232,12 +245,14 @@ export function useOrderStatus(orderId: number) {
         success: boolean;
         data: { status: string; updatedAt: string };
       }>(`/public/orders/${orderId}/status`);
-      return response.data;
+      return response;
     },
     enabled: !!orderId,
-    staleTime: 15 * 1000, // 15 seconds for real-time polling
+    staleTime: 15 * 1000,
     gcTime: 1 * 60 * 1000,
-    refetchInterval: 10 * 1000, // Refetch every 10 seconds
+    refetchInterval: 10 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -249,12 +264,14 @@ export function useTrackOrder(orderId: number) {
     queryKey: ["trackOrder", orderId],
     queryFn: async () => {
       const response = await apiClient.get<OrderResponse>(`/public/orders/${orderId}/track`);
-      return response.data;
+      return response;
     },
     enabled: !!orderId,
     staleTime: 30 * 1000,
     gcTime: 5 * 60 * 1000,
-    refetchInterval: 15 * 1000, // Refetch every 15 seconds for live tracking
+    refetchInterval: 15 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -267,7 +284,7 @@ export function useCancelOrder() {
   return useMutation({
     mutationFn: async (orderId: number) => {
       const response = await apiClient.delete<OrderResponse>(`/public/orders/${orderId}`);
-      return response.data;
+      return response;
     },
     onSuccess: (_, orderId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.orderById(orderId) });
@@ -286,7 +303,7 @@ export function useValidateOrder() {
         success: boolean;
         data: { valid: boolean; errors?: string[] };
       }>("/public/orders/validate", orderData);
-      return response.data;
+      return response;
     },
   });
 }

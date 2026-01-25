@@ -21,6 +21,8 @@ export interface Product {
   categoryId?: number;
   isAvailable?: boolean;
   is_available?: boolean;
+  track_inventory?: boolean;
+  quantity_in_stock?: number;
   rating?: number;
 }
 
@@ -55,7 +57,7 @@ function ProductCardComponent({
     setIsAdded(true);
   };
 
-  const isRTL = locale === "ar";
+  const isAvailable = product.isAvailable !== false && product.is_available !== false;
 
   // Fallback colors if theme not loaded
   const bgColor = themeColors?.background || "#ffffff";
@@ -107,13 +109,13 @@ function ProductCardComponent({
         )}
 
         {/* Availability Badge */}
-        {!(product.isAvailable !== false && product.is_available !== false) && (
+        {!isAvailable && (
           <div
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex items-center justify-center z-10"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           >
             <span style={{ color: "#ffffff", fontWeight: "600" }}>
-              {locale === "en" ? "Out of Stock" : "غير متوفر"}
+              {locale === "en" ? "Unavailable" : "غير متوفر"}
             </span>
           </div>
         )}
@@ -169,7 +171,7 @@ function ProductCardComponent({
             ${product.price.toFixed(2)}
           </span>
 
-          {product.isAvailable !== false ? (
+          {isAvailable ? (
             <div className="flex items-center gap-2">
               {/* Quantity Selector */}
               <div
@@ -215,14 +217,14 @@ function ProductCardComponent({
                 style={
                   isAdded
                     ? {
-                        backgroundColor: "#22c55e",
-                        color: "#ffffff",
-                        borderColor: "#22c55e",
-                      }
+                      backgroundColor: "#22c55e",
+                      color: "#ffffff",
+                      borderColor: "#22c55e",
+                    }
                     : {
-                        borderColor: primaryColor,
-                        color: primaryColor,
-                      }
+                      borderColor: primaryColor,
+                      color: primaryColor,
+                    }
                 }
               >
                 {isAdded ? (

@@ -172,23 +172,11 @@ type CreateProductRequest struct {
 
 // UpdateProductRequest is the request DTO for updating products
 type UpdateProductRequest struct {
-	CategoryID         *int     `json:"category_id"`
-	NameEn             *string  `json:"name_en"`
-	NameAr             *string  `json:"name_ar"`
-	DescriptionEn      *string  `json:"description_en"`
-	DescriptionAr      *string  `json:"description_ar"`
-	Price              *float64 `json:"price"`
-	Cost               *float64 `json:"cost"`
-	DiscountPrice      *float64 `json:"discount_price"`
-	DiscountPercentage *float64 `json:"discount_percentage"`
-	IsAvailable        *bool    `json:"is_available"`
-	AvailableFrom      *string  `json:"available_from"`
-	AvailableUntil     *string  `json:"available_until"`
-	AvailableDays      []string `json:"available_days"`
-	TrackInventory     *bool    `json:"track_inventory"`
-	LowStockThreshold  *int     `json:"low_stock_threshold"`
-	Featured           *bool    `json:"featured"`
-	DisplayOrder       *int     `json:"display_order"`
+	CategoryID  *int     `json:"category_id"`
+	NameEn      *string  `json:"name_en"`
+	NameAr      *string  `json:"name_ar"`
+	Price       *float64 `json:"price"`
+	IsAvailable *bool    `json:"is_available"`
 }
 
 // ProductListResponse is paginated list response

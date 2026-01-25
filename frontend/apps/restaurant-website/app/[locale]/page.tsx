@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   try {
     // Fetch theme data for metadata (used for OG tags)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1';
     const themeResponse = await fetch(
       `${apiUrl}/public/restaurants/${restaurantSlug}/theme`,
       {
@@ -132,7 +132,7 @@ export default async function HomePage({ params }: PageProps) {
 
   try {
     // Fetch all data in PARALLEL (not sequential!)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1';
 
     const [homepageResponse, themeResponse, productsResponse] = await Promise.all([
       fetch(`${apiUrl}/public/restaurants/${restaurantSlug}/homepage`, {

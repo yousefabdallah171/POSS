@@ -13,9 +13,9 @@ import (
 
 // ProductUseCase handles product business logic
 type ProductUseCase struct {
-	repo              *repository.ProductRepository
-	notificationRepo  *repository.NotificationRepository
-	storageURL        string // S3 or local storage URL
+	repo             *repository.ProductRepository
+	notificationRepo *repository.NotificationRepository
+	storageURL       string // S3 or local storage URL
 }
 
 // NewProductUseCase creates new product use case
@@ -158,9 +158,6 @@ func (uc *ProductUseCase) UpdateProduct(
 	}
 	if req.IsAvailable != nil {
 		product.IsAvailable = *req.IsAvailable
-	}
-	if req.DisplayOrder != nil {
-		product.DisplayOrder = *req.DisplayOrder
 	}
 
 	product.UpdatedBy = &userID
